@@ -206,7 +206,7 @@ Results:
 
 - Moran's I: −0.1142
 - Expected Moran's I: −0.0417
-- Permutation p-value: 0.2830
+- Permutation p-value: 0.2860
 
 No statistically significant spatial autocorrelation was detected in the regression residuals under this specification.
 
