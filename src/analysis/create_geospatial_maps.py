@@ -79,8 +79,8 @@ def main() -> None:
     create_map(
         dataset,
         column="median_transit_distance_m",
-        title="Transit Accessibility Across the CollegeTownIQ Study Area",
-        legend_label="Median distance to transit stop (m)",
+        title="Network Transit Accessibility Across the CollegeTownIQ Study Area",
+        legend_label="Median pedestrian-network distance to transit stop (m)",
         filename="transit_accessibility_map.png",
     )
 

@@ -43,7 +43,6 @@ def prepare_dashboard_data(
         )
 
     dashboard_data = dataset[REQUIRED_COLUMNS].copy()
-    dashboard_data = dashboard_data.rename(columns={"median_network_transit_distance_m": "median_transit_distance_m"})
 
     if dashboard_data["GEOID"].duplicated().any():
         raise ValueError("Duplicate GEOIDs found.")

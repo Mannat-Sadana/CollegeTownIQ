@@ -307,9 +307,9 @@ select {
 
       <option value="median_rent_burden_pct">Median Rent Burden</option>
 
-      <option value="median_transit_distance_m">
+      <option value="median_network_transit_distance_m">
 
-        Transit Distance (250m Sample)
+        Network Transit Distance
 
       </option>
 
@@ -353,7 +353,7 @@ select {
 
     <div class="metric">
 
-      <div class="metric-label">Transit Distance (250m Sample)</div>
+      <div class="metric-label">Network Transit Distance</div>
 
       <div class="metric-value">—</div>
 
@@ -429,7 +429,7 @@ select {
 
       <div class="card-value" id="median-transit">—</div>
 
-      <div class="card-subtitle">Median 250m-sampled straight-line distance</div>
+      <div class="card-subtitle">Median pedestrian-network distance</div>
 
     </div>
 
@@ -586,11 +586,11 @@ const metricInfo = {
 
 
 
-  median_transit_distance_m: {
+  median_network_transit_distance_m: {
 
-    title: "Transit Distance (250m Sample)",
+    title: "Network Transit Distance",
 
-    label: "Median 250m-Sampled Transit Distance",
+    label: "Median Pedestrian-Network Transit Distance",
 
     format: value => Math.round(value).toLocaleString() + " m"
 
@@ -890,19 +890,19 @@ function showSelectedArea(p) {
 
     <div class="metric">
 
-      <div class="metric-label">Transit Distance (250m Sample)</div>
+      <div class="metric-label">Network Transit Distance</div>
 
       <div class="metric-value">
 
         ${
 
-          p.median_transit_distance_m == null
+          p.median_network_transit_distance_m == null
 
             ? "—"
 
             : Math.round(
 
-                Number(p.median_transit_distance_m)
+                Number(p.median_network_transit_distance_m)
 
               ).toLocaleString() + " m"
 
@@ -988,7 +988,7 @@ function updateSummary() {
 
     geojsonData.features
 
-      .map(f => Number(f.properties.median_transit_distance_m))
+      .map(f => Number(f.properties.median_network_transit_distance_m))
 
       .filter(v => !isNaN(v));
 

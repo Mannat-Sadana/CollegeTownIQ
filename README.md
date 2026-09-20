@@ -8,9 +8,9 @@ CollegeTownIQ is a geospatial data science platform that investigates how housin
 
 *Median gross rent across the State College study area. Source: 2024 ACS 5-Year estimates.*
 
-![Transit Accessibility by Census Tract](docs/figures/maps/transit_accessibility_map.png)
+![Network Transit Accessibility by Census Tract](docs/figures/maps/transit_accessibility_map.png)
 
-*Median distance to the nearest CATA transit stop across the study area.*
+*Median pedestrian-network distance to the nearest CATA transit stop across the study area.*
 
 The project uses **State College, Pennsylvania** as a detailed case study and combines public housing, socioeconomic, transportation, food-access, and geographic data to quantify location-level tradeoffs.
 
