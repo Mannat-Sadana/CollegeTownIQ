@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>CollegeTownIQ | State College</title>
+
+
+
+<link
+
+  rel="stylesheet"
+
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+
+/>
+
+
+
+<style>
+:root {
+    --navy: #14213d;
+    --blue: #2563eb;
+    --blue-soft: #eff6ff;
+    --green: #168a5b;
+    --ink: #172033;
+    --muted: #667085;
+    --line: #e5e7eb;
+    --surface: #ffffff;
+    --background: #f6f8fb;
+    --shadow: 0 8px 30px rgba(15, 23, 42, 0.07);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background: var(--background);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.6;
+}
+
+header {
+    background: var(--navy);
+    color: white;
+    padding: 34px 48px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 34px;
+    letter-spacing: -0.8px;
+}
+
+header p {
+    margin: 6px 0 0;
+    color: #cbd5e1;
+    font-size: 15px;
+}
+
+main {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 34px 40px 60px;
+}
+
+h2 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 25px;
+    letter-spacing: -0.4px;
+}
+
+p {
+    color: var(--muted);
+}
+
+.control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 22px 0;
+    padding: 16px 18px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+.control label {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+select {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 9px 34px 9px 11px;
+    background: white;
+    color: var(--ink);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#selected-info {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin: 20px 0 26px;
+}
+
+.metric {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+}
+
+.metric-label {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.metric-value {
+    margin-top: 6px;
+    color: var(--ink);
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.map-panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.map-header {
+    padding: 24px 26px 16px;
+}
+
+.map-header h2 {
+    font-size: 21px;
+}
+
+.map-header p {
+    margin: 6px 0 0;
+    font-size: 14px;
+}
+
+#map {
+    width: 100%;
+    height: 620px;
+    min-height: 500px;
+    background: #eaf0f6;
+}
+
+.insight {
+    margin-top: 28px;
+    padding: 26px 28px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+.insight h2 {
+    font-size: 20px;
+}
+
+.insight p {
+    max-width: 900px;
+    margin-bottom: 0;
+}
+
+.card-title {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.card-value {
+    margin-top: 7px;
+    color: var(--ink);
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.card-subtitle {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.leaflet-container {
+    font-family: inherit;
+}
+
+@media (max-width: 900px) {
+    main {
+        padding: 24px 20px 40px;
+    }
+
+    header {
+        padding: 28px 20px;
+    }
+
+    #selected-info {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #map {
+        height: 520px;
+    }
+}
+
+@media (max-width: 560px) {
+    header h1 {
+        font-size: 28px;
+    }
+
+    #selected-info {
+        grid-template-columns: 1fr;
+    }
+
+    .control {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    #map {
+        height: 450px;
+    }
+}
+</style>
+
+</head>
+
+
+
+<body>
+
+
+
+<header>
+
+  <h1>CollegeTownIQ</h1>
+
+  <p>Affordability, accessibility, and mobility intelligence for State College, PA
+
+
+</header>
+
+
+
+<div class="layout">
+
+
+
+<aside class="sidebar">
+
+
+
+  <h2>Explore the town</h2>
+
+
+
+  <p>
+
+    CollegeTownIQ examines how housing affordability and access to
+
+    transportation and essential services vary across the college-town landscape.
+
+  
+
+
+
+
+  <div class="control">
+
+    <label for="metric">Map metric</label>
+
+
+
+    <select id="metric">
+
+      <option value="median_gross_rent">Median Gross Rent</option>
+
+      <option value="median_rent_burden_pct">Median Rent Burden</option>
+
+      <option value="median_transit_distance_m">
+
+        Transit Accessibility
+
+      </option>
+
+      <option value="food_access_beyond_half_mile_network_share">
+
+        Food Access
+
+      </option>
+
+      <option value="vehicle_access_pct">Vehicle Access</option>
+
+    </select>
+
+  </div>
+
+
+
+  <div id="selected-info">
+
+
+
+    <div class="metric">
+
+      <div class="metric-label">Selected Area</div>
+
+      <div class="metric-value">None</div>
+
+    </div>
+
+
+
+    <div class="metric">
+
+      <div class="metric-label">Median Rent</div>
+
+      <div class="metric-value">—</div>
+
+    </div>
+
+
+
+    <div class="metric">
+
+      <div class="metric-label">Transit Distance</div>
+
+      <div class="metric-value">—</div>
+
+    </div>
+
+
+
+    <div class="metric">
+
+      <div class="metric-label">Food Access</div>
+
+      <div class="metric-value">—</div>
+
+    </div>
+
+
+
+  </div>
+
+
+
+  <div class="note">
+
+    Data are analyzed at the census-tract level. Accessibility metrics are
+
+    derived measures and should be interpreted as area-level indicators rather
+
+    than individual household measurements.
+
+  </div>
+
+
+
+</aside>
+
+
+
+<main class="main">
+
+
+
+  <section class="cards">
+
+
+
+    <div class="card">
+
+      <div class="card-title">TRACTS ANALYZED</div>
+
+      <div class="card-value" id="tract-count">—</div>
+
+      <div class="card-subtitle">State College study area</div>
+
+    </div>
+
+
+
+    <div class="card">
+
+      <div class="card-title">MEDIAN RENT</div>
+
+      <div class="card-value" id="median-rent">—</div>
+
+      <div class="card-subtitle">Monthly gross rent</div>
+
+    </div>
+
+
+
+    <div class="card">
+
+      <div class="card-title">TRANSIT ACCESS</div>
+
+      <div class="card-value" id="median-transit">—</div>
+
+      <div class="card-subtitle">Median sampled distance</div>
+
+    </div>
+
+
+
+    <div class="card">
+
+      <div class="card-title">FOOD ACCESS</div>
+
+      <div class="card-value" id="median-food">—</div>
+
+      <div class="card-subtitle">Network-based measure</div>
+
+    </div>
+
+
+
+  </section>
+
+
+
+  <section class="map-panel">
+
+
+
+    <div class="map-header">
+
+      <h2 id="map-title">Housing Affordability</h2>
+
+      <p>
+
+        Select a metric and click a census tract to inspect its characteristics.
+
+      
+
+
+    </div>
+
+
+
+    <div id="map"></div>
+
+
+
+  </section>
+
+
+
+  <section class="insight">
+
+
+
+    <h2>How to read CollegeTownIQ</h2>
+
+
+
+    <p>
+
+      The map is designed to reveal tradeoffs rather than produce a single
+
+      “best neighborhood” score. Housing cost, transit accessibility, food
+
+      access, and transportation characteristics are intentionally presented
+
+      as separate dimensions so users can examine how they interact.
+
+    
+
+
+
+
+    <p>
+
+      This allows the analysis to ask a more useful question:
+
+      <strong>how does the practical burden of living in a college town change
+
+      depending on where someone lives?</strong>
+
+    
+
+
+
+
+  </section>
+
+
+
+</main>
+
+
+
+</div>
+
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
+
+<script>
+
+
+
+let geojsonData = null;
+
+let geojsonLayer = null;
+
+
+
+const map = L.map("map").setView([40.7934, -77.86], 11);
+
+
+
+L.tileLayer(
+
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+
+  {
+
+    attribution: "© OpenStreetMap contributors"
+
+  }
+
+).addTo(map);
+
+
+
+const metricInfo = {
+
+
+
+  median_gross_rent: {
+
+    title: "Housing Affordability",
+
+    label: "Median Gross Rent",
+
+    format: value => "$" + Math.round(value).toLocaleString()
+
+  },
+
+
+
+  median_rent_burden_pct: {
+
+    title: "Rent Burden",
+
+    label: "Median Rent Burden",
+
+    format: value => value.toFixed(1) + "%"
+
+  },
+
+
+
+  median_transit_distance_m: {
+
+    title: "Transit Accessibility",
+
+    label: "Median Transit Distance",
+
+    format: value => Math.round(value).toLocaleString() + " m"
+
+  },
+
+
+
+  food_access_beyond_half_mile_network_share: {
+
+    title: "Food Access",
+
+    label: "Population Beyond 1/2 Mile",
+
+    format: value => value.toFixed(1) + "%"
+
+  },
+
+
+
+  vehicle_access_pct: {
+
+    title: "Vehicle Access",
+
+    label: "Households With Vehicle Access",
+
+    format: value => value.toFixed(1) + "%"
+
+  }
+
+
+
+};
+
+
+
+function getValues(metric) {
+
+
+
+  return geojsonData.features
+
+    .map(feature => feature.properties[metric])
+
+    .filter(value => value !== null && value !== undefined && !isNaN(value));
+
+
+
+}
+
+
+
+function getColor(value, values) {
+
+
+
+  const min = Math.min(...values);
+
+  const max = Math.max(...values);
+
+
+
+  if (max === min) return "#64748b";
+
+
+
+  const normalized = (value - min) / (max - min);
+
+
+
+  if (normalized < .2) return "#edf8fb";
+
+  if (normalized < .4) return "#b2e2e2";
+
+  if (normalized < .6) return "#66c2a4";
+
+  if (normalized < .8) return "#2ca25f";
+
+
+
+  return "#006d2c";
+
+}
+
+
+
+function styleFeature(feature) {
+
+
+
+  const metric = document.getElementById("metric").value;
+
+  const values = getValues(metric);
+
+  const value = feature.properties[metric];
+
+
+
+  return {
+
+
+
+    fillColor:
+
+      value === null || value === undefined
+
+        ? "#d1d5db"
+
+        : getColor(value, values),
+
+
+
+    weight: 1,
+
+    color: "#ffffff",
+
+    fillOpacity: .75
+
+
+
+  };
+
+
+
+}
+
+
+
+function updateMap() {
+
+
+
+  const metric = document.getElementById("metric").value;
+
+
+
+  document.getElementById("map-title").textContent =
+
+    metricInfo[metric].title;
+
+
+
+  if (geojsonLayer) {
+
+    geojsonLayer.remove();
+
+  }
+
+
+
+  geojsonLayer = L.geoJSON(
+
+    geojsonData,
+
+    {
+
+      style: styleFeature,
+
+
+
+      onEachFeature: function(feature, layer) {
+
+
+
+        const p = feature.properties;
+
+        const value = p[metric];
+
+
+
+        layer.bindTooltip(
+
+          "<strong>Tract " +
+
+          (p.GEOID || "Unknown") +
+
+          "</strong>" +
+
+          metricInfo[metric].label +
+
+          ": " +
+
+          (
+
+            value === null ||
+
+            value === undefined ||
+
+            isNaN(value)
+
+              ? "No data"
+
+              : metricInfo[metric].format(Number(value))
+
+          )
+
+        );
+
+
+
+        layer.on({
+
+
+
+          mouseover: function(event) {
+
+            event.target.setStyle({
+
+              weight: 3,
+
+              color: "#17202a",
+
+              fillOpacity: .9
+
+            });
+
+          },
+
+
+
+          mouseout: function(event) {
+
+            geojsonLayer.resetStyle(event.target);
+
+          },
+
+
+
+          click: function() {
+
+            showSelectedArea(p);
+
+          }
+
+
+
+        });
+
+
+
+      }
+
+
+
+    }
+
+  ).addTo(map);
+
+
+
+}
+
+
+
+function showSelectedArea(p) {
+
+
+
+  document.getElementById("selected-info").innerHTML = `
+
+
+
+    <div class="metric">
+
+      <div class="metric-label">Selected Tract</div>
+
+      <div class="metric-value">
+
+        ${p.GEOID || "Unknown"}
+
+      </div>
+
+    </div>
+
+
+
+    <div class="metric">
+
+      <div class="metric-label">Median Rent</div>
+
+      <div class="metric-value">
+
+        ${
+
+          p.median_gross_rent == null
+
+            ? "—"
+
+            : "$" + Number(p.median_gross_rent).toLocaleString()
+
+        }
+
+      </div>
+
+    </div>
+
+
+
+    <div class="metric">
+
+      <div class="metric-label">Transit Distance</div>
+
+      <div class="metric-value">
+
+        ${
+
+          p.median_transit_distance_m == null
+
+            ? "—"
+
+            : Math.round(
+
+                Number(p.median_transit_distance_m)
+
+              ).toLocaleString() + " m"
+
+        }
+
+      </div>
+
+    </div>
+
+
+
+    <div class="metric">
+
+      <div class="metric-label">Food Access</div>
+
+      <div class="metric-value">
+
+        ${
+
+          p.food_access_beyond_half_mile_network_share == null
+
+            ? "—"
+
+            : Number(
+
+                p.food_access_beyond_half_mile_network_share
+
+              ).toFixed(1) + "%"
+
+        }
+
+      </div>
+
+    </div>
+
+
+
+    <div class="metric">
+
+      <div class="metric-label">Vehicle Access</div>
+
+      <div class="metric-value">
+
+        ${
+
+          p.vehicle_access_pct == null
+
+            ? "—"
+
+            : Number(p.vehicle_access_pct).toFixed(1) + "%"
+
+        }
+
+      </div>
+
+    </div>
+
+
+
+  `;
+
+
+
+}
+
+
+
+function updateSummary() {
+
+
+
+  const rentValues =
+
+    geojsonData.features
+
+      .map(f => Number(f.properties.median_gross_rent))
+
+      .filter(v => !isNaN(v));
+
+
+
+  const transitValues =
+
+    geojsonData.features
+
+      .map(f => Number(f.properties.median_transit_distance_m))
+
+      .filter(v => !isNaN(v));
+
+
+
+  const foodValues =
+
+    geojsonData.features
+
+      .map(
+
+        f =>
+
+          Number(
+
+            f.properties.food_access_beyond_half_mile_network_share
+
+          )
+
+      )
+
+      .filter(v => !isNaN(v));
+
+
+
+  function median(values) {
+
+
+
+    values = [...values].sort((a,b) => a-b);
+
+
+
+    const middle = Math.floor(values.length / 2);
+
+
+
+    return values.length % 2
+
+      ? values[middle]
+
+      : (values[middle - 1] + values[middle]) / 2;
+
+
+
+  }
+
+
+
+  document.getElementById("tract-count").textContent =
+
+    geojsonData.features.length;
+
+
+
+  document.getElementById("median-rent").textContent =
+
+    "$" + Math.round(median(rentValues)).toLocaleString();
+
+
+
+  document.getElementById("median-transit").textContent =
+
+    Math.round(median(transitValues)).toLocaleString() + " m";
+
+
+
+  document.getElementById("median-food").textContent =
+
+    median(foodValues).toFixed(1) + "%";
+
+
+
+}
+
+
+
+fetch("data/college_town_data.geojson")
+
+
+
+  .then(response => {
+
+
+
+    if (!response.ok) {
+
+      throw new Error("Could not load dashboard data.");
+
+    }
+
+
+
+    return response.json();
+
+
+
+  })
+
+
+
+  .then(data => {
+
+
+
+    geojsonData = data;
+
+
+
+    updateSummary();
+
+    updateMap();
+
+
+
+  })
+
+
+
+  .catch(error => {
+
+
+
+    document.getElementById("map").innerHTML = `
+
+      <div style="
+
+        padding:40px;
+
+        font-size:18px;
+
+        color:#b42318;
+
+      ">
+
+        <strong>Dashboard data could not be loaded.</strong>
+
+        
+
+        ${error.message}
+
+      </div>
+
+    `;
+
+
+
+  });
+
+
+
+document
+
+  .getElementById("metric")
+
+  .addEventListener("change", updateMap);
+
+
+
+</script>
+
+
+
+</body>
+
+</html>
+
+</body>

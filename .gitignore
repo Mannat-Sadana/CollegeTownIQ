@@ -48,3 +48,6 @@ data/processed/*
 build/
 dist/
 *.egg-info/
+
+# Cache
+cache/

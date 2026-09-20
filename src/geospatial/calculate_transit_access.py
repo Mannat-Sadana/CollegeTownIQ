@@ -1,70 +1,99 @@
+from pathlib import Path
+
 import geopandas as gpd
 
-TRACTS_PATH = "data/processed/college_town_features.gpkg"
-TRANSIT_DISTANCE_PATH = "data/processed/transit_distance.gpkg"
-OUTPUT_PATH = "data/processed/transit_access.gpkg"
 
-PROJECTED_CRS = "EPSG:26918"
+TRACTS_PATH = Path("data/processed/college_town_features.gpkg")
+DISTANCE_PATH = Path("data/processed/transit_distance.gpkg")
+FREQUENCY_PATH = Path("data/processed/transit_frequency.gpkg")
+OUTPUT_PATH = Path("data/processed/transit_access.gpkg")
 
 
 def calculate_transit_access() -> None:
     tracts = gpd.read_file(TRACTS_PATH)
-    transit_distances = gpd.read_file(TRANSIT_DISTANCE_PATH)
+    distances = gpd.read_file(DISTANCE_PATH)
+    frequency = gpd.read_file(FREQUENCY_PATH)
 
-    tracts = tracts.to_crs(PROJECTED_CRS)
-    transit_distances = transit_distances.to_crs(PROJECTED_CRS)
+    study_geoids = distances[["GEOID"]].drop_duplicates()
 
-    stop_counts = (
-        transit_distances.groupby("GEOID")
-        .size()
-        .rename("transit_stop_count")
-        .reset_index()
+    tracts = tracts.merge(
+        study_geoids,
+        on="GEOID",
+        how="inner",
+        validate="one_to_one",
     )
 
-    nearest_distances = (
-        transit_distances.groupby("GEOID")["nearest_transit_stop_distance_m"]
-        .min()
-        .rename("nearest_transit_stop_distance_m")
-        .reset_index()
-    )
+    frequency = frequency[
+        [
+            "GEOID",
+            "transit_stop_count",
+            "scheduled_trip_count",
+            "scheduled_stop_events",
+        ]
+    ].copy()
+
+    distances = distances[
+        [
+            "GEOID",
+            "nearest_transit_stop_distance_m",
+        ]
+    ].copy()
 
     transit_access = tracts.merge(
-        stop_counts,
+        frequency,
         on="GEOID",
         how="left",
+        validate="one_to_one",
     )
 
     transit_access = transit_access.merge(
-        nearest_distances,
+        distances,
         on="GEOID",
         how="left",
+        validate="one_to_one",
     )
 
-    transit_access["transit_stop_count"] = (
-        transit_access["transit_stop_count"]
-        .fillna(0)
-        .astype(int)
-    )
+    required_columns = [
+        "transit_stop_count",
+        "scheduled_trip_count",
+        "scheduled_stop_events",
+        "nearest_transit_stop_distance_m",
+    ]
+
+    if transit_access[required_columns].isna().any().any():
+        raise ValueError(
+            "Some study-area tracts are missing transit data."
+        )
 
     transit_access.to_file(
         OUTPUT_PATH,
+        layer="transit_access",
         driver="GPKG",
     )
 
     print(f"Saved transit access dataset to {OUTPUT_PATH}")
     print(f"Rows: {len(transit_access)}")
     print(
-        "Tracts with transit stops:",
-        (transit_access["transit_stop_count"] > 0).sum(),
+        "Unique GEOIDs:",
+        transit_access["GEOID"].nunique(),
     )
     print(
-        "Total assigned stops:",
+        "Total transit stops:",
         transit_access["transit_stop_count"].sum(),
     )
     print(
-        "Nearest-stop distance available for:",
-        transit_access["nearest_transit_stop_distance_m"].notna().sum(),
-        "tracts",
+        "Tracts with transit service:",
+        (
+            transit_access["scheduled_trip_count"] > 0
+        ).sum(),
+    )
+    print(
+        "Scheduled stop events:",
+        transit_access["scheduled_stop_events"].sum(),
+    )
+    print(
+        "Median nearest-stop distance (m):",
+        f"{transit_access['nearest_transit_stop_distance_m'].median():.2f}",
     )
 
 

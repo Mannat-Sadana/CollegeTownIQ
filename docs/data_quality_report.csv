@@ -1,0 +1,12 @@
+feature,rows,missing_values,non_missing_values,minimum,median,maximum
+median_gross_rent,28,3,25,674.0,1214.0,1924.0
+median_rent_burden_pct,28,3,25,9.0,35.8,51.0
+median_household_income,28,3,25,13994.0,84063.0,164412.0
+households_without_vehicle,28,0,28,0.0,84.5,671.0
+total_households_vehicle,28,0,28,0.0,1540.0,2711.0
+vehicle_access_pct,28,1,27,0.0,94.93827160493827,100.0
+transit_stop_count,28,0,28,0.0,8.0,35.0
+nearest_transit_stop_distance_m,28,0,28,7.181570523860981,577.6595405151136,13836.357391256488
+scheduled_trip_count,28,0,28,0.0,800.0,4040.0
+scheduled_stop_events,28,0,28,0.0,2535.5,12640.0
+annual_rent_to_income_ratio,28,3,25,0.049193489526311945,0.17084419490675756,0.932971273402887
