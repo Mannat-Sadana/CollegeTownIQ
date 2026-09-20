@@ -309,7 +309,7 @@ select {
 
       <option value="median_transit_distance_m">
 
-        Transit Accessibility
+        Transit Distance (250m Sample)
 
       </option>
 
@@ -353,7 +353,7 @@ select {
 
     <div class="metric">
 
-      <div class="metric-label">Transit Distance</div>
+      <div class="metric-label">Transit Distance (250m Sample)</div>
 
       <div class="metric-value">—</div>
 
@@ -429,7 +429,7 @@ select {
 
       <div class="card-value" id="median-transit">—</div>
 
-      <div class="card-subtitle">Median sampled distance</div>
+      <div class="card-subtitle">Median 250m-sampled straight-line distance</div>
 
     </div>
 
@@ -588,9 +588,9 @@ const metricInfo = {
 
   median_transit_distance_m: {
 
-    title: "Transit Accessibility",
+    title: "Transit Distance (250m Sample)",
 
-    label: "Median Transit Distance",
+    label: "Median 250m-Sampled Transit Distance",
 
     format: value => Math.round(value).toLocaleString() + " m"
 
@@ -890,7 +890,7 @@ function showSelectedArea(p) {
 
     <div class="metric">
 
-      <div class="metric-label">Transit Distance</div>
+      <div class="metric-label">Transit Distance (250m Sample)</div>
 
       <div class="metric-value">
 
