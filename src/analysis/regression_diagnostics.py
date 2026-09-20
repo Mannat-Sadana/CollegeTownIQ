@@ -6,7 +6,9 @@ import statsmodels.api as sm
 from scipy import stats
 
 
-INPUT_PATH = Path("data/processed/college_town_master.gpkg")
+INPUT_PATH = Path(
+    "data/processed/college_town_analysis.gpkg"
+)
 OUTPUT_DIR = Path("docs/figures")
 
 
@@ -16,28 +18,34 @@ def load_data():
 
 def prepare_model_data(dataset):
     columns = [
-        "median_rent_burden_pct",
-        "food_access_beyond_half_mile_network_share",
-        "median_network_transit_distance_m",
+        "median_gross_rent",
+        "median_transit_distance_m",
         "median_household_income",
         "vehicle_access_pct",
     ]
 
     data = dataset[columns].dropna().copy()
 
+    data["transit_distance_km"] = (
+        data["median_transit_distance_m"] / 1000
+    )
+
+    data["income_10k"] = (
+        data["median_household_income"] / 10000
+    )
+
     return data
 
 
 def fit_full_model(data):
     predictors = [
-        "food_access_beyond_half_mile_network_share",
-        "median_network_transit_distance_m",
-        "median_household_income",
+        "transit_distance_km",
+        "income_10k",
         "vehicle_access_pct",
     ]
 
     x = sm.add_constant(data[predictors])
-    y = data["median_rent_burden_pct"]
+    y = data["median_gross_rent"]
 
     model = sm.OLS(y, x).fit(cov_type="HC3")
 
