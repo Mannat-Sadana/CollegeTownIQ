@@ -1,19 +1,21 @@
 from pathlib import Path
 
 import geopandas as gpd
-import statsmodels.api as sm
 import pandas as pd
+import statsmodels.api as sm
 
 
-INPUT_PATH = Path("data/processed/college_town_master.gpkg")
-OUTPUT_PATH = Path("docs/regression_sensitivity.csv")
+INPUT_PATH = Path(
+    "data/processed/college_town_analysis.gpkg"
+)
+OUTPUT_PATH = Path(
+    "docs/regression_sensitivity.csv"
+)
 
-
-TARGET = "median_rent_burden_pct"
+TARGET = "median_gross_rent"
 
 PREDICTORS = [
-    "food_access_beyond_half_mile_network_share",
-    "median_network_transit_distance_m",
+    "median_transit_distance_m",
     "median_household_income",
     "vehicle_access_pct",
 ]
@@ -24,60 +26,99 @@ def load_model_data():
 
     columns = ["GEOID", TARGET] + PREDICTORS
 
-    data = dataset[columns].dropna().reset_index(drop=True)
+    data = dataset[columns].dropna().copy()
 
-    return data
+    data["transit_distance_km"] = (
+        data["median_transit_distance_m"] / 1000
+    )
+
+    data["income_10k"] = (
+        data["median_household_income"] / 10000
+    )
+
+    return data.reset_index(drop=True)
 
 
 def fit_model(data):
-    x = sm.add_constant(data[PREDICTORS])
+    predictors = [
+        "transit_distance_km",
+        "income_10k",
+        "vehicle_access_pct",
+    ]
+
+    x = sm.add_constant(data[predictors])
     y = data[TARGET]
 
     return sm.OLS(y, x).fit(cov_type="HC3")
 
 
-def calculate_results(data, excluded_indices, scenario):
-    analysis_data = data.drop(
-        index=excluded_indices
-    ).reset_index(drop=True)
+def calculate_results(
+    data,
+    excluded_geoids,
+    scenario,
+):
+    analysis_data = data[
+        ~data["GEOID"].isin(excluded_geoids)
+    ].copy()
 
     model = fit_model(analysis_data)
 
-    results = {
+    transit_coefficient = model.params[
+        "transit_distance_km"
+    ]
+
+    transit_p_value = model.pvalues[
+        "transit_distance_km"
+    ]
+
+    confidence_interval = model.conf_int().loc[
+        "transit_distance_km"
+    ]
+
+    return {
         "scenario": scenario,
         "observations": len(analysis_data),
         "r_squared": model.rsquared,
         "adjusted_r_squared": model.rsquared_adj,
+        "transit_distance_coefficient": transit_coefficient,
+        "transit_distance_p_value": transit_p_value,
+        "transit_distance_ci_lower": confidence_interval[0],
+        "transit_distance_ci_upper": confidence_interval[1],
     }
-
-    for predictor in PREDICTORS:
-        results[f"{predictor}_coefficient"] = model.params[
-            predictor
-        ]
-        results[f"{predictor}_p_value"] = model.pvalues[
-            predictor
-        ]
-
-    return results
 
 
 def main():
     data = load_model_data()
 
     scenarios = [
-        ([], "All observations"),
-        ([12], "Exclude observation 12"),
-        ([17], "Exclude observation 17"),
-        ([12, 17], "Exclude observations 12 and 17"),
+        (
+            [],
+            "All observations",
+        ),
+        (
+            ["42027011903"],
+            "Exclude 42027011903",
+        ),
+        (
+            ["42027012300"],
+            "Exclude 42027012300",
+        ),
+        (
+            [
+                "42027011903",
+                "42027012300",
+            ],
+            "Exclude both influential observations",
+        ),
     ]
 
     results = []
 
-    for excluded_indices, scenario in scenarios:
+    for excluded_geoids, scenario in scenarios:
         results.append(
             calculate_results(
                 data,
-                excluded_indices,
+                excluded_geoids,
                 scenario,
             )
         )
