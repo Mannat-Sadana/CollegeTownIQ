@@ -4,6 +4,10 @@
 
 CollegeTownIQ is a geospatial data science platform that investigates how housing affordability and accessibility interact within a college town.
 
+![Median Gross Rent by Census Tract](docs/figures/maps/median_gross_rent_map.png)
+
+*Median gross rent across the State College study area. Source: 2024 ACS 5-Year estimates.*
+
 The project uses **State College, Pennsylvania** as a detailed case study and combines public housing, socioeconomic, transportation, food-access, and geographic data to quantify location-level tradeoffs.
 
 Instead of producing a single "best neighborhood" score, CollegeTownIQ keeps affordability and accessibility as separate dimensions so users can examine the tradeoffs themselves.
