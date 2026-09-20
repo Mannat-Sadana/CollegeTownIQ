@@ -1,81 +1,140 @@
 # CollegeTownIQ Research Findings
 
-This report summarizes the descriptive and statistical analysis performed on the CollegeTownIQ State College study area.
+This report summarizes the descriptive, geospatial, and statistical analysis performed on the CollegeTownIQ State College study area.
 
-**Important:** These results describe associations among the observed tract-level measures. They do not establish causal relationships.
+**Important:** These results describe associations among observed tract-level measures. They do not establish causal relationships.
 
 ## 1. Study Coverage
 
 - Study-area observations: **28 census tracts**
-- Complete observations used in the main statistical analysis: **25**
+- Complete observations used in the primary statistical model: **25**
 - Geographic unit: 2024 Census tracts intersecting the CollegeTownIQ study area
 - Study area: State College Borough, College Township, Ferguson Township, Harris Township, and Patton Township
 
 ## 2. Housing Affordability
 
-- Median tract-level gross rent across the analytical sample: **$1,214 per month**.
-- Median tract-level household income: **$84,063 annually**.
-- Median tract-level rent burden measure: **35.8%**.
-- Observed median gross rent ranged from **$674** to **$1,924**.
+- Median tract-level gross rent: **$1,214 per month**
+- Median tract-level household income: **$84,063 annually**
+- Rent burden is retained as a secondary housing measure.
+- Observed median gross rent ranged from **$674** to **$1,924**
+
+The tract-level gross-rent measure is an area-level statistic and should not be interpreted as the rent paid by every household in a tract.
 
 ## 3. Transit Accessibility
 
-- Median tract-level sampled network transit distance: **639.4 meters**.
-- Mean tract-level sampled network transit distance: **2,826.9 meters**.
-- Range: **164.9 to 13,425.3 meters**.
-- Transit accessibility is represented by the tract-level sampled network-distance measure used in the master dataset.
+The primary accessibility measure is a **250-meter sampled straight-line distance** to the nearest CATA transit stop.
+
+A 500-meter sampling resolution was evaluated as a sensitivity check.
+
+- The primary model uses the 250m sampled straight-line measure.
+- A separate pedestrian-network analysis provides a different accessibility perspective.
+- Straight-line and network measures are kept conceptually separate because they represent different accessibility assumptions.
+
+- Median primary transit-distance measure: **423.3 meters**
 
 ## 4. Food Access
 
-- Median straight-line food-access measure: **61.0%**.
-- Median network-based food-access measure: **87.7%**.
-- Mean absolute difference between the two food-access methods in the 28-tract study area: **14.13 percentage points**.
-- The straight-line and network measures are therefore not interchangeable and are retained separately.
+USDA Food Access Research Atlas / SRAM measures were integrated as a separate essential-service accessibility dimension.
 
-## 5. Correlation Analysis
+The project retains both straight-line and network-based food-access measures rather than treating them as interchangeable.
 
-Pearson correlations are reported as descriptive associations, not causal effects.
+Food access is used as a complementary analysis rather than as a predictor in the primary gross-rent regression.
 
-- Rent burden vs. `food_access_beyond_half_mile_network_share`: **r = -0.711**
-- Rent burden vs. `median_network_transit_distance_m`: **r = -0.453**
-- Rent burden vs. `median_household_income`: **r = -0.728**
-- Rent burden vs. `vehicle_access_pct`: **r = -0.697**
+## 5. Descriptive Relationships
 
-## 6. Multivariable Regression
+Pearson correlations are used to describe relationships among tract-level variables.
 
-The full model estimates the association between tract-level rent burden and food access, transit distance, household income, and vehicle access.
+- Median gross rent vs. 250m sampled straight-line transit distance: **r = -0.391**
+- Median gross rent vs. median household income: **r = 0.092**
+- Median rent burden vs. median household income: **r = -0.728**
+- Median rent burden vs. 250m sampled straight-line transit distance: **r = -0.410**
+
+These are descriptive associations and should not be interpreted as causal effects.
+
+## 6. Primary Multivariable Regression
+
+The primary model estimates the association between tract-level median gross rent and transit accessibility while controlling for median household income and vehicle access.
 
 - Observations: **25**
-- R²: **0.643**
-- Adjusted R²: **0.572**
+- R²: **0.190**
+- Adjusted R²: **0.075**
+- Overall F-test p-value: **0.0671**
 
 | Predictor | Coefficient | Robust p-value |
 |---|---:|---:|
-| `food_access_beyond_half_mile_network_share` | -0.1143 | 0.2135 |
-| `median_network_transit_distance_m` | -0.0005 | 0.19 |
-| `median_household_income` | -0.0001 | 0.2367 |
-| `vehicle_access_pct` | -0.0338 | 0.8563 |
+| Transit distance (km) | **-35.404** | **0.0066** |
+| Household income ($10,000s) | -2.562 | 0.953 |
+| Vehicle access (%) | 5.260 | 0.575 |
 
-Coefficient signs describe the direction of the estimated association while holding the other included variables constant.
+The estimated coefficient for transit distance corresponds to approximately **$35 lower tract-level median gross rent per additional kilometer of the 250-meter sampled straight-line transit-distance measure**, conditional on the other included variables.
 
-## 7. Model Diagnostics
+This is an association at the census-tract level, not evidence that increasing or decreasing transit access causes rents to change.
 
-- Heteroskedasticity-robust (HC3) standard errors were used for inference.
-- Residual diagnostics and influence diagnostics were performed separately.
-- Sensitivity analysis examined the effect of excluding observations with relatively high Cook's distance.
-- The model should be interpreted cautiously because the analytical sample contains only 25 observations.
+## 7. Influence and Sensitivity Analysis
 
-## 8. Important Limitations
+- GEOID `42027011903`: Cook's distance ≈ **0.709**
+- GEOID `42027012300`: Cook's distance ≈ **0.424**
+
+The transit-distance association remained similar when these observations were removed individually or together.
+
+| Scenario | Observations | Transit coefficient | p-value |
+|---|---:|---:|---:|
+| All observations | 25 | -35.40 | 0.0066 |
+| Remove 42027011903 | 24 | -36.05 | 0.0153 |
+| Remove 42027012300 | 24 | -32.70 | 0.0157 |
+| Remove both | 23 | -33.96 | 0.0105 |
+
+## 8. Spatial Residual Diagnostics
+
+- Observations: **25**
+- Neighborhood definition: **Queen contiguity**
+- Average neighbors: **5.04**
+- Moran's I: **-0.1142**
+- Permutation p-value: **0.2700**
+
+The selected test did not detect statistically significant spatial autocorrelation in the primary regression residuals.
+
+## 9. Secondary Accessibility Analysis
+
+- Pedestrian-network transit accessibility
+- Food-access measures
+- Alternative spatial sampling resolutions
+- Transit accessibility method differences
+
+These analyses provide methodological context and sensitivity checks but are not substituted for the primary gross-rent model.
+
+## 10. Interpretation
+
+Within the analyzed State College study area, tracts with greater sampled straight-line distance to CATA transit stops tended to have lower median gross rents after accounting for median household income and vehicle access.
+
+The result should be interpreted as an **observed tract-level association**. It does not establish that transit accessibility causes housing costs to increase or decrease.
+
+The project therefore focuses on identifying **tradeoffs and spatial patterns** rather than producing a universal ranking of neighborhoods.
+
+## 11. Important Limitations
 
 - The analysis uses census-tract-level data rather than individual households.
-- Several ACS variables are unavailable for three study-area tracts, reducing the complete-case sample.
-- The study area contains only 28 tracts, so statistical estimates have limited precision.
-- Transit accessibility is based on sampled spatial/network distance rather than observed individual travel behavior.
-- Food-access measures come from the USDA food-access framework and should not be interpreted as a complete measure of food availability or food quality.
-- The tract inclusion rule is based on geographic intersection with the study area, so some included tracts cross municipal boundaries.
-- Associations in the regression models should not be interpreted as causal effects.
-- The project does not produce a universal 'best neighborhood' score.
+- Only 25 complete observations are available for the primary regression.
+- Several ACS variables are unavailable for three study-area tracts.
+- The study area contains only 28 tracts, limiting statistical precision.
+- Straight-line transit distance is not equivalent to walking distance or travel time.
+- The pedestrian-network analysis provides a separate accessibility perspective but does not model individual travel behavior.
+- Food-access measures come from the USDA food-access framework and do not represent every dimension of food availability, quality, or affordability.
+- Some census tracts cross municipal boundaries because the study-area inclusion rule is based on geographic intersection.
+- Associations should not be interpreted as causal effects.
+- The project does not produce a universal "best neighborhood" score.
 
-## 9. Reproducibility
+## 12. Reproducibility
 
-The findings are generated programmatically from the CollegeTownIQ master dataset so that the analytical summary can be regenerated when the underlying data or methods change.
+The primary findings are generated from the CollegeTownIQ processed analysis dataset and can be reproduced using the analysis scripts in `src/analysis/`.
+
+Key reproducible components include:
+
+- Primary affordability-accessibility regression
+- Regression diagnostics
+- Cook's-distance influence analysis
+- Leave-out sensitivity analysis
+- Spatial residual diagnostics
+- Transit accessibility sensitivity analysis
+
+The repository keeps analytical methods separate from generated outputs so that results can be regenerated when underlying data or methodology changes.

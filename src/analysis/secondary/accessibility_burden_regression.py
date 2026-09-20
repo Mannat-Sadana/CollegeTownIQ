@@ -1,3 +1,9 @@
+"""Secondary analysis of rent burden, food access, and network transit accessibility.
+
+This analysis is retained as a methodological extension and is separate from
+the project's primary gross-rent accessibility model.
+"""
+
 from pathlib import Path
 
 import geopandas as gpd

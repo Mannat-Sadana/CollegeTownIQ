@@ -1,54 +1,83 @@
 from pathlib import Path
 
 import geopandas as gpd
+import numpy as np
 import pandas as pd
 import statsmodels.api as sm
+from libpysal.weights import Queen
+from esda.moran import Moran
 
 
-INPUT_PATH = Path("data/processed/college_town_master.gpkg")
+INPUT_PATH = Path("data/processed/college_town_analysis.gpkg")
 OUTPUT_PATH = Path("docs/research_findings.md")
 
 
-FEATURES = [
-    "median_gross_rent",
-    "median_rent_burden_pct",
+TARGET = "median_gross_rent"
+
+PREDICTORS = [
+    "median_transit_distance_m",
     "median_household_income",
     "vehicle_access_pct",
-    "transit_stop_count",
-    "scheduled_trip_count",
-    "median_network_transit_distance_m",
-    "food_access_beyond_half_mile_straight_share",
-    "food_access_beyond_half_mile_network_share",
 ]
 
 
 def load_data() -> gpd.GeoDataFrame:
-    """Load the master CollegeTownIQ dataset."""
+    """Load the primary CollegeTownIQ analysis dataset."""
     return gpd.read_file(INPUT_PATH)
 
 
 def prepare_analysis_data(
     dataset: gpd.GeoDataFrame,
 ) -> pd.DataFrame:
-    """Create a complete-case analytical dataset."""
-    analysis_data = dataset[FEATURES + ["GEOID"]].copy()
+    """Create the complete-case dataset used by the primary model."""
 
-    for column in FEATURES:
+    columns = [
+        "GEOID",
+        TARGET,
+        *PREDICTORS,
+    ]
+
+    analysis_data = dataset[columns].copy()
+
+    for column in columns[1:]:
         analysis_data[column] = pd.to_numeric(
             analysis_data[column],
             errors="coerce",
         )
 
     return analysis_data.dropna(
-        subset=[
-            "median_gross_rent",
-            "median_rent_burden_pct",
-            "median_household_income",
-            "vehicle_access_pct",
-            "median_network_transit_distance_m",
-            "food_access_beyond_half_mile_network_share",
-        ]
+        subset=[TARGET, *PREDICTORS]
     ).reset_index(drop=True)
+
+
+def fit_primary_model(
+    analysis_data: pd.DataFrame,
+):
+    """Fit the primary gross-rent accessibility model."""
+
+    model_data = analysis_data.copy()
+
+    model_data["transit_distance_km"] = (
+        model_data["median_transit_distance_m"] / 1000
+    )
+
+    model_data["income_10k"] = (
+        model_data["median_household_income"] / 10000
+    )
+
+    x = model_data[
+        [
+            "transit_distance_km",
+            "income_10k",
+            "vehicle_access_pct",
+        ]
+    ]
+
+    x = sm.add_constant(x)
+
+    y = model_data[TARGET]
+
+    return sm.OLS(y, x).fit(cov_type="HC3")
 
 
 def format_currency(value: float) -> str:
@@ -56,327 +85,572 @@ def format_currency(value: float) -> str:
     return f"${value:,.0f}"
 
 
+def calculate_influence(
+    model,
+    analysis_data: pd.DataFrame,
+) -> pd.DataFrame:
+    """Calculate Cook's distance for each observation."""
+
+    influence = model.get_influence()
+
+    result = analysis_data[
+        ["GEOID"]
+    ].copy()
+
+    result["cooks_distance"] = (
+        influence.cooks_distance[0]
+    )
+
+    return result.sort_values(
+        "cooks_distance",
+        ascending=False,
+    )
+
+
+def fit_model_without_geoids(
+    analysis_data: pd.DataFrame,
+    excluded_geoids: list[str],
+):
+    """Fit the primary model after excluding selected GEOIDs."""
+
+    filtered = analysis_data[
+        ~analysis_data["GEOID"].isin(excluded_geoids)
+    ].copy()
+
+    return fit_primary_model(filtered)
+
+
+def calculate_spatial_diagnostics(
+    analysis_data: pd.DataFrame,
+    model,
+    dataset: gpd.GeoDataFrame,
+) -> tuple[float, float, float]:
+    """Calculate Moran's I for primary-model residuals."""
+
+    residual_data = analysis_data[
+        ["GEOID"]
+    ].copy()
+
+    residual_data["residual"] = model.resid
+
+    geometry_data = dataset[
+        ["GEOID", "geometry"]
+    ].copy()
+
+    geometry_data = geometry_data[
+        geometry_data["GEOID"].isin(
+            residual_data["GEOID"]
+        )
+    ]
+
+    geometry_data = geometry_data.merge(
+        residual_data,
+        on="GEOID",
+        how="inner",
+        validate="one_to_one",
+    )
+
+    geometry_data = geometry_data.reset_index(
+        drop=True
+    )
+
+    weights = Queen.from_dataframe(
+        geometry_data,
+        use_index=False,
+    )
+
+    np.random.seed(42)
+
+    moran = Moran(
+        geometry_data["residual"],
+        weights,
+        permutations=999,
+    )
+
+    average_neighbors = float(
+        np.mean(
+            [
+                len(neighbors)
+                for neighbors in weights.neighbors.values()
+            ]
+        )
+    )
+
+    return (
+        float(moran.I),
+        float(moran.p_sim),
+        average_neighbors,
+    )
+
+
 def generate_report(
     dataset: gpd.GeoDataFrame,
     analysis_data: pd.DataFrame,
+    model,
+    influence: pd.DataFrame,
+    sensitivity_models: dict,
+    moran_i: float,
+    moran_p: float,
+    average_neighbors: float,
 ) -> str:
-    """Generate the research findings report."""
+    """Generate the current CollegeTownIQ research findings report."""
 
-    report_lines = []
+    rent = analysis_data[TARGET]
+    income = analysis_data["median_household_income"]
 
-    report_lines.append("# CollegeTownIQ Research Findings")
-    report_lines.append("")
-    report_lines.append(
-        "This report summarizes the descriptive and statistical "
-        "analysis performed on the CollegeTownIQ State College "
-        "study area."
+    transit_distance = (
+        analysis_data["median_transit_distance_m"]
     )
-    report_lines.append("")
-    report_lines.append(
+
+    report = []
+
+    report.append("# CollegeTownIQ Research Findings")
+    report.append("")
+    report.append(
+        "This report summarizes the descriptive, geospatial, "
+        "and statistical analysis performed on the CollegeTownIQ "
+        "State College study area."
+    )
+    report.append("")
+    report.append(
         "**Important:** These results describe associations "
-        "among the observed tract-level measures. They do not "
+        "among observed tract-level measures. They do not "
         "establish causal relationships."
     )
-    report_lines.append("")
+    report.append("")
 
-    # ------------------------------------------------------------------
-    # Study coverage
-    # ------------------------------------------------------------------
-
-    report_lines.append("## 1. Study Coverage")
-    report_lines.append("")
-
-    report_lines.append(
+    report.append("## 1. Study Coverage")
+    report.append("")
+    report.append(
         f"- Study-area observations: **{len(dataset)} census tracts**"
     )
-    report_lines.append(
-        f"- Complete observations used in the main statistical "
-        f"analysis: **{len(analysis_data)}**"
+    report.append(
+        f"- Complete observations used in the primary statistical "
+        f"model: **{len(analysis_data)}**"
     )
-    report_lines.append(
-        "- Geographic unit: 2024 Census tracts intersecting the "
-        "CollegeTownIQ study area"
+    report.append(
+        "- Geographic unit: 2024 Census tracts intersecting "
+        "the CollegeTownIQ study area"
     )
-    report_lines.append(
+    report.append(
         "- Study area: State College Borough, College Township, "
         "Ferguson Township, Harris Township, and Patton Township"
     )
-    report_lines.append("")
+    report.append("")
 
-    # ------------------------------------------------------------------
-    # Housing
-    # ------------------------------------------------------------------
-
-    rent = analysis_data["median_gross_rent"]
-    burden = analysis_data["median_rent_burden_pct"]
-    income = analysis_data["median_household_income"]
-
-    report_lines.append("## 2. Housing Affordability")
-    report_lines.append("")
-
-    report_lines.append(
-        f"- Median tract-level gross rent across the analytical "
-        f"sample: **{format_currency(rent.median())} per month**."
+    report.append("## 2. Housing Affordability")
+    report.append("")
+    report.append(
+        f"- Median tract-level gross rent: "
+        f"**{format_currency(rent.median())} per month**"
     )
-    report_lines.append(
+    report.append(
         f"- Median tract-level household income: "
-        f"**{format_currency(income.median())} annually**."
+        f"**{format_currency(income.median())} annually**"
     )
-    report_lines.append(
+    report.append(
         f"- Median tract-level rent burden measure: "
-        f"**{burden.median():.1f}%**."
+        f"**{analysis_data.get('median_rent_burden_pct', pd.Series(dtype=float)).median():.1f}%**"
+        if "median_rent_burden_pct" in analysis_data
+        else "- Rent burden is retained as a secondary housing measure."
     )
-    report_lines.append(
+    report.append(
         f"- Observed median gross rent ranged from "
         f"**{format_currency(rent.min())}** to "
-        f"**{format_currency(rent.max())}**."
+        f"**{format_currency(rent.max())}**"
     )
-    report_lines.append("")
-
-    # ------------------------------------------------------------------
-    # Transit
-    # ------------------------------------------------------------------
-
-    transit = analysis_data["median_network_transit_distance_m"]
-
-    report_lines.append("## 3. Transit Accessibility")
-    report_lines.append("")
-
-    report_lines.append(
-        f"- Median tract-level sampled network transit distance: "
-        f"**{transit.median():,.1f} meters**."
+    report.append("")
+    report.append(
+        "The tract-level gross-rent measure is an area-level "
+        "statistic and should not be interpreted as the rent "
+        "paid by every household in a tract."
     )
-    report_lines.append(
-        f"- Mean tract-level sampled network transit distance: "
-        f"**{transit.mean():,.1f} meters**."
+    report.append("")
+
+    report.append("## 3. Transit Accessibility")
+    report.append("")
+    report.append(
+        "The primary accessibility measure is a **250-meter "
+        "sampled straight-line distance** to the nearest CATA "
+        "transit stop."
     )
-    report_lines.append(
-        f"- Range: **{transit.min():,.1f} to "
-        f"{transit.max():,.1f} meters**."
+    report.append("")
+    report.append(
+        "A 500-meter sampling resolution was evaluated as a "
+        "sensitivity check."
     )
-    report_lines.append(
-        "- Transit accessibility is represented by the "
-        "tract-level sampled network-distance measure used in "
-        "the master dataset."
+    report.append("")
+    report.append(
+        "- The primary model uses the 250m sampled straight-line measure."
     )
-    report_lines.append("")
-
-    # ------------------------------------------------------------------
-    # Food access
-    # ------------------------------------------------------------------
-
-    food_straight = analysis_data[
-        "food_access_beyond_half_mile_straight_share"
-    ]
-
-    food_network = analysis_data[
-        "food_access_beyond_half_mile_network_share"
-    ]
-
-    report_lines.append("## 4. Food Access")
-    report_lines.append("")
-
-    report_lines.append(
-        f"- Median straight-line food-access measure: "
-        f"**{food_straight.median():.1f}%**."
+    report.append(
+        "- A separate pedestrian-network analysis provides a "
+        "different accessibility perspective."
     )
-    report_lines.append(
-        f"- Median network-based food-access measure: "
-        f"**{food_network.median():.1f}%**."
+    report.append(
+        "- Straight-line and network measures are kept "
+        "conceptually separate because they represent "
+        "different accessibility assumptions."
     )
-    report_lines.append(
-        f"- Mean absolute difference between the two food-access "
-        f"methods in the 28-tract study area: **14.13 percentage "
-        f"points**."
+    report.append("")
+    report.append(
+        f"- Median primary transit-distance measure: "
+        f"**{transit_distance.median():,.1f} meters**"
     )
-    report_lines.append(
-        "- The straight-line and network measures are therefore "
-        "not interchangeable and are retained separately."
+    report.append("")
+
+    report.append("## 4. Food Access")
+    report.append("")
+    report.append(
+        "USDA Food Access Research Atlas / SRAM measures were "
+        "integrated as a separate essential-service accessibility "
+        "dimension."
     )
-    report_lines.append("")
-
-    # ------------------------------------------------------------------
-    # Correlations
-    # ------------------------------------------------------------------
-
-    correlation_columns = [
-        "median_rent_burden_pct",
-        "food_access_beyond_half_mile_network_share",
-        "median_network_transit_distance_m",
-        "median_household_income",
-        "vehicle_access_pct",
-    ]
-
-    correlations = analysis_data[correlation_columns].corr()
-
-    report_lines.append("## 5. Correlation Analysis")
-    report_lines.append("")
-    report_lines.append(
-        "Pearson correlations are reported as descriptive "
-        "associations, not causal effects."
+    report.append("")
+    report.append(
+        "The project retains both straight-line and network-based "
+        "food-access measures rather than treating them as interchangeable."
     )
-    report_lines.append("")
+    report.append("")
+    report.append(
+        "Food access is used as a complementary analysis rather "
+        "than as a predictor in the primary gross-rent regression."
+    )
+    report.append("")
 
-    for column in correlation_columns[1:]:
-        value = correlations.loc[
+    report.append("## 5. Descriptive Relationships")
+    report.append("")
+    report.append(
+        "Pearson correlations are used to describe relationships "
+        "among tract-level variables."
+    )
+    report.append("")
+
+    correlation_data = dataset[
+        [
+            "median_gross_rent",
+            "median_household_income",
+            "median_transit_distance_m",
             "median_rent_burden_pct",
-            column,
         ]
+    ].copy()
 
-        report_lines.append(
-            f"- Rent burden vs. `{column}`: **r = {value:.3f}**"
-        )
-
-    report_lines.append("")
-
-    # ------------------------------------------------------------------
-    # Regression
-    # ------------------------------------------------------------------
-
-    regression_columns = [
-        "food_access_beyond_half_mile_network_share",
-        "median_network_transit_distance_m",
-        "median_household_income",
-        "vehicle_access_pct",
-    ]
-
-    regression_data = analysis_data[
-        ["median_rent_burden_pct"] + regression_columns
-    ].dropna()
-
-    y = regression_data["median_rent_burden_pct"]
-
-    x = regression_data[regression_columns].copy()
-    x = sm.add_constant(x)
-
-    model = sm.OLS(y, x).fit(cov_type="HC3")
-
-    report_lines.append("## 6. Multivariable Regression")
-    report_lines.append("")
-
-    report_lines.append(
-        "The full model estimates the association between "
-        "tract-level rent burden and food access, transit "
-        "distance, household income, and vehicle access."
+    correlation_data = correlation_data.apply(
+        pd.to_numeric,
+        errors="coerce",
     )
-    report_lines.append("")
 
-    report_lines.append(
+    gross_rent_corr = correlation_data.corr()
+
+    report.append(
+        f"- Median gross rent vs. 250m sampled straight-line "
+        f"transit distance: **r = "
+        f"{gross_rent_corr.loc['median_gross_rent', 'median_transit_distance_m']:.3f}**"
+    )
+    report.append(
+        f"- Median gross rent vs. median household income: **r = "
+        f"{gross_rent_corr.loc['median_gross_rent', 'median_household_income']:.3f}**"
+    )
+    report.append(
+        f"- Median rent burden vs. median household income: **r = "
+        f"{gross_rent_corr.loc['median_rent_burden_pct', 'median_household_income']:.3f}**"
+    )
+    report.append(
+        f"- Median rent burden vs. 250m sampled straight-line "
+        f"transit distance: **r = "
+        f"{gross_rent_corr.loc['median_rent_burden_pct', 'median_transit_distance_m']:.3f}**"
+    )
+    report.append("")
+    report.append(
+        "These are descriptive associations and should not be "
+        "interpreted as causal effects."
+    )
+    report.append("")
+
+    report.append("## 6. Primary Multivariable Regression")
+    report.append("")
+    report.append(
+        "The primary model estimates the association between "
+        "tract-level median gross rent and transit accessibility "
+        "while controlling for median household income and vehicle access."
+    )
+    report.append("")
+    report.append(
         f"- Observations: **{int(model.nobs)}**"
     )
-    report_lines.append(
+    report.append(
         f"- R²: **{model.rsquared:.3f}**"
     )
-    report_lines.append(
+    report.append(
         f"- Adjusted R²: **{model.rsquared_adj:.3f}**"
     )
-    report_lines.append("")
+    report.append(
+        f"- Overall F-test p-value: **{model.f_pvalue:.4f}**"
+    )
+    report.append("")
+    report.append("| Predictor | Coefficient | Robust p-value |")
+    report.append("|---|---:|---:|")
+    report.append(
+        f"| Transit distance (km) | "
+        f"**{model.params['transit_distance_km']:.3f}** | "
+        f"**{model.pvalues['transit_distance_km']:.4f}** |"
+    )
+    report.append(
+        f"| Household income ($10,000s) | "
+        f"{model.params['income_10k']:.3f} | "
+        f"{model.pvalues['income_10k']:.3f} |"
+    )
+    report.append(
+        f"| Vehicle access (%) | "
+        f"{model.params['vehicle_access_pct']:.3f} | "
+        f"{model.pvalues['vehicle_access_pct']:.3f} |"
+    )
+    report.append("")
+    report.append(
+        "The estimated coefficient for transit distance corresponds "
+        f"to approximately **${abs(model.params['transit_distance_km']):.0f} "
+        "lower tract-level median gross rent per additional kilometer "
+        "of the 250-meter sampled straight-line transit-distance "
+        "measure**, conditional on the other included variables."
+    )
+    report.append("")
+    report.append(
+        "This is an association at the census-tract level, not "
+        "evidence that increasing or decreasing transit access "
+        "causes rents to change."
+    )
+    report.append("")
 
-    report_lines.append("| Predictor | Coefficient | Robust p-value |")
-    report_lines.append("|---|---:|---:|")
+    report.append("## 7. Influence and Sensitivity Analysis")
+    report.append("")
+    influential = influence[
+        influence["cooks_distance"] > 4 / len(analysis_data)
+    ]
 
-    for column in regression_columns:
-        report_lines.append(
-            f"| `{column}` | "
-            f"{model.params[column]:.4f} | "
-            f"{model.pvalues[column]:.4g} |"
+    for _, row in influential.head(2).iterrows():
+        report.append(
+            f"- GEOID `{row['GEOID']}`: Cook's distance ≈ "
+            f"**{row['cooks_distance']:.3f}**"
         )
 
-    report_lines.append("")
-
-    report_lines.append(
-        "Coefficient signs describe the direction of the "
-        "estimated association while holding the other included "
-        "variables constant."
+    report.append("")
+    report.append(
+        "The transit-distance association remained similar when "
+        "these observations were removed individually or together."
     )
-    report_lines.append("")
-
-    # ------------------------------------------------------------------
-    # Diagnostics
-    # ------------------------------------------------------------------
-
-    report_lines.append("## 7. Model Diagnostics")
-    report_lines.append("")
-
-    report_lines.append(
-        "- Heteroskedasticity-robust (HC3) standard errors were "
-        "used for inference."
+    report.append("")
+    report.append(
+        "| Scenario | Observations | Transit coefficient | p-value |"
     )
-    report_lines.append(
-        "- Residual diagnostics and influence diagnostics were "
-        "performed separately."
-    )
-    report_lines.append(
-        "- Sensitivity analysis examined the effect of excluding "
-        "observations with relatively high Cook's distance."
-    )
-    report_lines.append(
-        "- The model should be interpreted cautiously because "
-        "the analytical sample contains only 25 observations."
-    )
-    report_lines.append("")
+    report.append("|---|---:|---:|---:|")
 
-    # ------------------------------------------------------------------
-    # Methodological limitations
-    # ------------------------------------------------------------------
+    scenarios = [
+        ("All observations", []),
+        ("Remove 42027011903", ["42027011903"]),
+        ("Remove 42027012300", ["42027012300"]),
+        (
+            "Remove both",
+            ["42027011903", "42027012300"],
+        ),
+    ]
 
-    report_lines.append("## 8. Important Limitations")
-    report_lines.append("")
+    for label, excluded in scenarios:
+        if not excluded:
+            sensitivity_model = model
+        else:
+            sensitivity_model = sensitivity_models[
+                tuple(excluded)
+            ]
 
+        report.append(
+            f"| {label} | "
+            f"{int(sensitivity_model.nobs)} | "
+            f"{sensitivity_model.params['transit_distance_km']:.2f} | "
+            f"{sensitivity_model.pvalues['transit_distance_km']:.4f} |"
+        )
+
+    report.append("")
+    report.append("## 8. Spatial Residual Diagnostics")
+    report.append("")
+    report.append(
+        f"- Observations: **{int(model.nobs)}**"
+    )
+    report.append(
+        "- Neighborhood definition: **Queen contiguity**"
+    )
+    report.append(
+        f"- Average neighbors: **{average_neighbors:.2f}**"
+    )
+    report.append(
+        f"- Moran's I: **{moran_i:.4f}**"
+    )
+    report.append(
+        f"- Permutation p-value: **{moran_p:.4f}**"
+    )
+    report.append("")
+    report.append(
+        "The selected test did not detect statistically "
+        "significant spatial autocorrelation in the primary "
+        "regression residuals."
+    )
+    report.append("")
+
+    report.append("## 9. Secondary Accessibility Analysis")
+    report.append("")
+    report.append(
+        "- Pedestrian-network transit accessibility"
+    )
+    report.append(
+        "- Food-access measures"
+    )
+    report.append(
+        "- Alternative spatial sampling resolutions"
+    )
+    report.append(
+        "- Transit accessibility method differences"
+    )
+    report.append("")
+    report.append(
+        "These analyses provide methodological context and "
+        "sensitivity checks but are not substituted for the "
+        "primary gross-rent model."
+    )
+    report.append("")
+
+    report.append("## 10. Interpretation")
+    report.append("")
+    report.append(
+        "Within the analyzed State College study area, tracts "
+        "with greater sampled straight-line distance to CATA "
+        "transit stops tended to have lower median gross rents "
+        "after accounting for median household income and vehicle access."
+    )
+    report.append("")
+    report.append(
+        "The result should be interpreted as an **observed "
+        "tract-level association**. It does not establish that "
+        "transit accessibility causes housing costs to increase or decrease."
+    )
+    report.append("")
+    report.append(
+        "The project therefore focuses on identifying **tradeoffs "
+        "and spatial patterns** rather than producing a universal "
+        "ranking of neighborhoods."
+    )
+    report.append("")
+
+    report.append("## 11. Important Limitations")
+    report.append("")
     limitations = [
         "The analysis uses census-tract-level data rather than individual households.",
-        "Several ACS variables are unavailable for three study-area tracts, reducing the complete-case sample.",
-        "The study area contains only 28 tracts, so statistical estimates have limited precision.",
-        "Transit accessibility is based on sampled spatial/network distance rather than observed individual travel behavior.",
-        "Food-access measures come from the USDA food-access framework and should not be interpreted as a complete measure of food availability or food quality.",
-        "The tract inclusion rule is based on geographic intersection with the study area, so some included tracts cross municipal boundaries.",
-        "Associations in the regression models should not be interpreted as causal effects.",
-        "The project does not produce a universal 'best neighborhood' score."
+        f"Only {int(model.nobs)} complete observations are available for the primary regression.",
+        "Several ACS variables are unavailable for three study-area tracts.",
+        f"The study area contains only {len(dataset)} tracts, limiting statistical precision.",
+        "Straight-line transit distance is not equivalent to walking distance or travel time.",
+        "The pedestrian-network analysis provides a separate accessibility perspective but does not model individual travel behavior.",
+        "Food-access measures come from the USDA food-access framework and do not represent every dimension of food availability, quality, or affordability.",
+        "Some census tracts cross municipal boundaries because the study-area inclusion rule is based on geographic intersection.",
+        "Associations should not be interpreted as causal effects.",
+        'The project does not produce a universal "best neighborhood" score.',
     ]
 
     for limitation in limitations:
-        report_lines.append(f"- {limitation}")
+        report.append(f"- {limitation}")
 
-    report_lines.append("")
+    report.append("")
 
-    # ------------------------------------------------------------------
-    # Reproducibility
-    # ------------------------------------------------------------------
-
-    report_lines.append("## 9. Reproducibility")
-    report_lines.append("")
-
-    report_lines.append(
-        "The findings are generated programmatically from the "
-        "CollegeTownIQ master dataset so that the analytical "
-        "summary can be regenerated when the underlying data or "
-        "methods change."
+    report.append("## 12. Reproducibility")
+    report.append("")
+    report.append(
+        "The primary findings are generated from the CollegeTownIQ "
+        "processed analysis dataset and can be reproduced using the "
+        "analysis scripts in `src/analysis/`."
     )
-    report_lines.append("")
+    report.append("")
+    report.append("Key reproducible components include:")
+    report.append("")
+    report.append("- Primary affordability-accessibility regression")
+    report.append("- Regression diagnostics")
+    report.append("- Cook's-distance influence analysis")
+    report.append("- Leave-out sensitivity analysis")
+    report.append("- Spatial residual diagnostics")
+    report.append("- Transit accessibility sensitivity analysis")
+    report.append("")
+    report.append(
+        "The repository keeps analytical methods separate from "
+        "generated outputs so that results can be regenerated when "
+        "underlying data or methodology changes."
+    )
 
-    return "\n".join(report_lines)
-
-
-def save_report(report: str) -> None:
-    """Save the generated Markdown report."""
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_PATH.write_text(report, encoding="utf-8")
-
-    print(f"Saved research findings to {OUTPUT_PATH}")
+    return "\n".join(report) + "\n"
 
 
 def main() -> None:
-    """Run the research findings pipeline."""
+    """Generate the current research findings report."""
+
     dataset = load_data()
     analysis_data = prepare_analysis_data(dataset)
 
-    print("CollegeTownIQ Research Findings")
-    print("===============================")
-    print(f"Master observations: {len(dataset)}")
-    print(f"Complete observations: {len(analysis_data)}")
+    model = fit_primary_model(analysis_data)
 
-    report = generate_report(dataset, analysis_data)
-    save_report(report)
+    influence = calculate_influence(
+        model,
+        analysis_data,
+    )
+
+    sensitivity_models = {
+        ("42027011903",): fit_model_without_geoids(
+            analysis_data,
+            ["42027011903"],
+        ),
+        ("42027012300",): fit_model_without_geoids(
+            analysis_data,
+            ["42027012300"],
+        ),
+        (
+            "42027011903",
+            "42027012300",
+        ): fit_model_without_geoids(
+            analysis_data,
+            [
+                "42027011903",
+                "42027012300",
+            ],
+        ),
+    }
+
+    moran_i, moran_p, average_neighbors = (
+        calculate_spatial_diagnostics(
+            analysis_data,
+            model,
+            dataset,
+        )
+    )
+
+    report = generate_report(
+        dataset=dataset,
+        analysis_data=analysis_data,
+        model=model,
+        influence=influence,
+        sensitivity_models=sensitivity_models,
+        moran_i=moran_i,
+        moran_p=moran_p,
+        average_neighbors=average_neighbors,
+    )
+
+    OUTPUT_PATH.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    OUTPUT_PATH.write_text(
+        report,
+        encoding="utf-8",
+    )
+
+    print(
+        f"Saved research findings to {OUTPUT_PATH}"
+    )
 
 
 if __name__ == "__main__":
