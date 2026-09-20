@@ -88,7 +88,7 @@ The network contained approximately:
 
 CATA stops were mapped to the pedestrian network and shortest-path distances were calculated.
 
-The network-based measure was used for the primary housing-accessibility regression.
+The 250-meter sampled straight-line measure was used for the primary housing-accessibility regression.
 
 ---
 
@@ -128,7 +128,7 @@ This demonstrates why network distance provides additional information beyond si
 
 The primary regression modeled tract-level median gross rent as a function of:
 
-- Network-based transit distance
+- 250-meter sampled straight-line transit distance
 - Median household income
 - Vehicle access
 
@@ -268,11 +268,11 @@ This provides evidence that the straight-line accessibility results are not high
 
 ## 13. Main Research Finding
 
-Within the 25 complete census-tract observations analyzed, greater network-based distance to public transit was associated with lower tract-level median gross rent after accounting for median household income and vehicle access.
+Within the 25 complete census-tract observations analyzed, greater 250-meter sampled straight-line distance to public transit was associated with lower tract-level median gross rent after accounting for median household income and vehicle access.
 
 The estimated association was approximately:
 
-> **$35 lower median gross rent per additional kilometer of network-based transit distance.**
+> **$35 lower median gross rent per additional kilometer of 250-meter sampled straight-line transit distance.**
 
 The estimated relationship remained similar when the two most influential observations were excluded.
 
