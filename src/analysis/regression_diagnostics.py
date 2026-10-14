@@ -16,6 +16,7 @@ def load_data():
     return gpd.read_file(INPUT_PATH)
 
 
+
 def prepare_model_data(dataset):
     columns = [
         "median_gross_rent",
@@ -24,7 +25,8 @@ def prepare_model_data(dataset):
         "vehicle_access_pct",
     ]
 
-    data = dataset[columns].dropna().copy()
+    data = dataset[["GEOID"] + columns].copy()
+    data = data.dropna(subset=columns).copy()
 
     data["transit_distance_km"] = (
         data["median_transit_distance_m"] / 1000
@@ -35,6 +37,7 @@ def prepare_model_data(dataset):
     )
 
     return data
+
 
 
 def fit_full_model(data):
@@ -86,7 +89,7 @@ def create_diagnostic_plots(model):
     plt.close(figure)
 
 
-def run_diagnostics(model):
+def run_diagnostics(model, data):
     residuals = model.resid
 
     shapiro_statistic, shapiro_pvalue = stats.shapiro(
@@ -145,11 +148,25 @@ def run_diagnostics(model):
         cooks_distance.argsort()[-5:][::-1]
     )
 
+
+
+    model_data = model.model.data.orig_exog
+
+    print("Largest Cook's distances by observation:")
+
     for index in largest_indices:
+        geoid = data.iloc[index]["GEOID"]
         print(
-            f"  Observation {index}: "
-            f"{cooks_distance[index]:.4f}"
+            f"Observation {index}: "
+            f"GEOID = {geoid}, "
+            f"Cook's distance = {cooks_distance[index]:.4f}"
         )
+
+
+    print("\nCorresponding predictor rows:")
+    print(model_data.iloc[largest_indices].to_string())
+
+
 
 
 def main():
@@ -158,7 +175,7 @@ def main():
     model = fit_full_model(data)
 
     create_diagnostic_plots(model)
-    run_diagnostics(model)
+    run_diagnostics(model, data)
 
     print()
     print("Saved diagnostic figures to docs/figures/")

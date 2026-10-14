@@ -210,9 +210,338 @@ select {
     color: var(--muted);
     font-size: 13px;
 }
+.insight-card {
+  margin-top: 24px;
+  padding: 28px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.insight-card .metric-label {
+  margin-bottom: 12px;
+}
+
+#selected-insight-text {
+  color: #64748b;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+#map-legend {
+    padding: 14px 20px 18px;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+}
+
+.legend-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+}
+
+.legend-scale {
+    display: flex;
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.legend-color {
+    flex: 1;
+}
+
+.legend-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+}
+
+/* =========================
+   MAIN DASHBOARD LAYOUT
+   ========================= */
+
+.layout {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: 28px;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 32px 40px 60px;
+}
+
+.sidebar {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 26px;
+    box-shadow: var(--shadow);
+    align-self: start;
+    position: sticky;
+    top: 24px;
+}
+
+.sidebar h2 {
+    margin-bottom: 12px;
+}
+
+.sidebar > p {
+    margin-bottom: 24px;
+    line-height: 1.6;
+}
+
+.control {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-bottom: 22px;
+}
+
+.sidebar .note {
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.main {
+    min-width: 0;
+}
+
+/* =========================
+   SUMMARY CARDS
+   ========================= */
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+    min-height: 130px;
+}
+
+.card-value {
+    margin-top: 8px;
+}
+
+/* =========================
+   SELECTED TRACT INFO
+   ========================= */
+
+#selected-info {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 16px;
+    margin: 0 0 28px;
+}
+
+#selected-info .metric {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    min-height: 120px;
+}
+
+#selected-info .metric-value {
+    margin-top: 8px;
+    color: var(--ink);
+    font-size: 22px;
+    font-weight: 700;
+}
+
+/* =========================
+   POLISHED DASHBOARD
+   ========================= */
+
+.map-panel {
+    border-radius: 18px;
+    box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+}
+
+.map-header {
+    padding: 28px 30px 20px;
+}
+
+.map-header h2 {
+    font-size: 24px;
+    letter-spacing: -0.5px;
+}
+
+.map-header p {
+    max-width: 700px;
+}
+
+.cards {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.card {
+    min-height: 145px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#selected-info .metric {
+    min-height: 135px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#map {
+    height: 600px;
+}
+
+.insight {
+    margin-top: 24px;
+    padding: 28px 30px;
+}
+
+.insight p {
+    max-width: 100%;
+}
+
+@media (max-width: 1200px) {
+    .layout {
+        grid-template-columns: 280px minmax(0, 1fr);
+        gap: 22px;
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* =========================
+   RESPONSIVE LAYOUT
+   ========================= */
+
+@media (max-width: 1100px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        position: static;
+    }
+
+    .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #selected-info {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 650px) {
+    .layout {
+        padding: 24px 16px 40px;
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
+
+    #selected-info {
+        grid-template-columns: 1fr;
+    }
+}
 
 .leaflet-container {
     font-family: inherit;
+}
+
+.selected-metric {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.selected-metric:last-child {
+    border-bottom: none;
+}
+
+.selected-metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.percentile-label {
+    margin-top: 7px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.percentile-track {
+    width: 100%;
+    height: 7px;
+    margin-top: 8px;
+    background: #e2e8f0;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.percentile-fill {
+    height: 100%;
+    background: #2ca25f;
+    border-radius: 999px;
+}
+
+.selected-tract-header {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.selected-tract-id {
+    margin-top: 5px;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.selected-insight {
+    margin-top: 16px;
+    padding: 18px 20px;
+    background: #f8fafc;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.selected-insight strong {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.selected-insight p {
+    margin: 6px 0 0;
+    color: var(--muted);
 }
 
 @media (max-width: 900px) {
@@ -251,6 +580,392 @@ select {
         height: 450px;
     }
 }
+
+.map-legend {
+    background: rgba(255, 255, 255, 0.96);
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.12);
+    min-width: 170px;
+}
+
+.legend-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.legend-scale {
+    display: flex;
+    height: 10px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.legend-scale span:nth-child(1) {
+    background: #edf8fb;
+    flex: 1;
+}
+
+.legend-scale span:nth-child(2) {
+    background: #b2e2e2;
+    flex: 1;
+}
+
+.legend-scale span:nth-child(3) {
+    background: #66c2a4;
+    flex: 1;
+}
+
+.legend-scale span:nth-child(4) {
+    background: #2ca25f;
+    flex: 1;
+}
+
+.legend-scale span:nth-child(5) {
+    background: #006d2c;
+    flex: 1;
+}
+
+.legend-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: 10px;
+    color: var(--muted);
+}
+
+
+.comparison-legend {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.comparison-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.comparison-legend-swatch {
+  display: inline-block;
+  width: 18px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.tract-one-swatch {
+  background: #e63946;
+}
+
+.tract-two-swatch {
+  background: #2563eb;
+}
+
+
+.selected-tract-header {
+  padding-bottom: 24px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.selected-tract-id {
+  margin-top: 8px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.5px;
+}
+
+.selected-metric {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.selected-metric:last-child {
+  border-bottom: none;
+}
+
+.selected-metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.selected-metric-header .metric-label {
+  margin-bottom: 0;
+}
+
+.selected-metric-header .metric-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: right;
+}
+
+.percentile-label {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.percentile-track {
+  width: 100%;
+  height: 6px;
+  margin-top: 7px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.percentile-fill {
+  height: 100%;
+  background: #2ca25f;
+  border-radius: 999px;
+}
+
+/* ================================
+   TWO-TRACT COMPARISON
+================================ */
+
+.comparison-panel {
+  margin-top: 32px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.comparison-header {
+  margin-bottom: 28px;
+}
+
+.comparison-header h2 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  color: var(--ink);
+}
+
+.comparison-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.comparison-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.comparison-select {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comparison-select label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.comparison-select select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+  color: var(--ink);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.comparison-select select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 18px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+.comparison-table th {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.comparison-table td {
+  font-size: 17px;
+  color: var(--ink);
+}
+
+.comparison-table td.metric-name {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.comparison-table td.metric-number {
+  font-weight: 600;
+}
+
+.comparison-table tr:last-child td {
+  border-bottom: none;
+}
+
+@media (max-width: 800px) {
+
+  .comparison-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .comparison-panel {
+    padding: 24px;
+  }
+
+  .comparison-table {
+    font-size: 14px;
+  }
+
+}
+
+
+
+	/* =========================
+	   DASHBOARD VISUAL POLISH
+	   ========================= */
+
+	.layout {
+	  gap: 28px;
+	  padding: 32px 40px 56px;
+	}
+
+	.sidebar {
+	  padding: 28px;
+	  border-radius: 20px;
+	}
+
+	.cards {
+	  gap: 20px;
+	  margin-bottom: 28px;
+	}
+
+	.card {
+	  padding: 26px;
+	  min-height: 145px;
+	  border-radius: 18px;
+	}
+
+	#selected-info {
+	  gap: 18px;
+	  margin-bottom: 28px;
+	}
+
+	#selected-info .metric {
+	  padding: 24px;
+	  min-height: 135px;
+	  border-radius: 18px;
+	}
+
+	.map-header {
+	  padding: 30px 32px 22px;
+	}
+
+	.comparison-panel {
+	  margin-top: 36px;
+	  padding: 36px;
+	  border-radius: 24px;
+	}
+
+	.comparison-header {
+	  margin-bottom: 32px;
+	}
+
+	.comparison-controls {
+	  gap: 28px;
+	  margin-bottom: 36px;
+	}
+
+	.comparison-table th,
+	.comparison-table td {
+	  padding: 20px;
+	}
+
+	.insight {
+	  margin-top: 28px;
+	  padding: 30px 32px;
+	  border-radius: 20px;
+	}
+
+	@media (max-width: 1200px) {
+	  .layout {
+	    gap: 22px;
+	    padding: 24px;
+	  }
+
+	  .comparison-panel {
+	    padding: 28px;
+	  }
+	}
+
+	@media (max-width: 650px) {
+	  .layout {
+	    padding: 16px 12px 28px;
+	  }
+
+	  .sidebar {
+	    padding: 18px;
+	  }
+
+	  .card,
+	  #selected-info .metric {
+	    padding: 18px;
+	  }
+
+	  .map-header,
+	  .insight {
+	    padding: 20px 18px;
+	  }
+
+	  .comparison-panel {
+	    padding: 18px;
+	  }
+
+	  .comparison-table th,
+	  .comparison-table td {
+	    padding: 12px 8px;
+	    font-size: 13px;
+	  }
+	}
+
+
 </style>
 
 </head>
@@ -327,51 +1042,7 @@ select {
 
 
 
-  <div id="selected-info">
 
-
-
-    <div class="metric">
-
-      <div class="metric-label">Selected Area</div>
-
-      <div class="metric-value">None</div>
-
-    </div>
-
-
-
-    <div class="metric">
-
-      <div class="metric-label">Median Rent</div>
-
-      <div class="metric-value">—</div>
-
-    </div>
-
-
-
-    <div class="metric">
-
-      <div class="metric-label">Network Transit Distance</div>
-
-      <div class="metric-value">—</div>
-
-    </div>
-
-
-
-    <div class="metric">
-
-      <div class="metric-label">Food Access</div>
-
-      <div class="metric-value">—</div>
-
-    </div>
-
-
-
-  </div>
 
 
 
@@ -449,34 +1120,93 @@ select {
 
   </section>
 
+<section id="selected-info">
+
+  <div class="metric">
+    <div class="metric-label">Selected Tract</div>
+    <div class="metric-value">None</div>
+  </div>
+
+  <div class="metric">
+    <div class="metric-label">Median Rent</div>
+    <div class="metric-value">—</div>
+  </div>
+
+  <div class="metric">
+    <div class="metric-label">Transit Distance</div>
+    <div class="metric-value">—</div>
+  </div>
+
+  <div class="metric">
+    <div class="metric-label">Food Access</div>
+    <div class="metric-value">—</div>
+  </div>
+
+  <div class="metric">
+    <div class="metric-label">Vehicle Access</div>
+    <div class="metric-value">—</div>
+  </div>
+
+</section>
+
+<section class="comparison-panel">
+
+  <div class="comparison-header">
+    <h2>Compare Census Tracts</h2>
+    <p>Select two tracts on the map to compare their characteristics.</p>
+  </div>
+
+  <div class="comparison-controls">
+
+    <div class="comparison-select">
+      <label for="tract-one">Tract 1</label>
+      <select id="tract-one">
+        <option value="">Select tract</option>
+      </select>
+    </div>
+
+    <div class="comparison-select">
+      <label for="tract-two">Tract 2</label>
+      <select id="tract-two">
+        <option value="">Select tract</option>
+      </select>
+    </div>
+
+  </div>
+
+  <div id="comparison-results">
+    <p class="comparison-placeholder">
+      Select two census tracts to compare them.
+    </p>
+  </div>
+
+</section>
+
+<section id="selected-insight" class="insight-card">
+  <div class="metric-label">Key Insight</div>
+  <div id="selected-insight-text">
+    Click a census tract to see how it compares with the study area.
+  </div>
+</section>
 
 
-  <section class="map-panel">
+<section class="map-panel">
 
+  <div class="map-header">
 
+    <h2 id="map-title">Housing Affordability</h2>
 
-    <div class="map-header">
+    <p>
+      Select a metric and click a census tract to inspect its characteristics.
+    </p>
 
-      <h2 id="map-title">Housing Affordability</h2>
+  </div>
 
-      <p>
+  <div id="map"></div>
 
-        Select a metric and click a census tract to inspect its characteristics.
+  <div id="map-legend"></div>
 
-      
-
-
-    </div>
-
-
-
-    <div id="map"></div>
-
-
-
-  </section>
-
-
+</section>
 
   <section class="insight">
 
@@ -538,7 +1268,9 @@ let geojsonData = null;
 
 let geojsonLayer = null;
 
+let comparisonTractOne = null;
 
+let comparisonTractTwo = null;
 
 const map = L.map("map").setView([40.7934, -77.86], 11);
 
@@ -626,97 +1358,179 @@ const metricInfo = {
 
 
 
-function getValues(metric) {
+    function getValues(metric) {
 
 
 
-  return geojsonData.features
+      return geojsonData.features
 
-    .map(feature => feature.properties[metric])
+        .map(feature => feature.properties[metric])
 
-    .filter(value => value !== null && value !== undefined && !isNaN(value));
-
-
-
-}
+        .filter(value => value !== null && value !== undefined && !isNaN(value));
 
 
 
-function getColor(value, values) {
+    }
 
 
 
-  const min = Math.min(...values);
+    function getColor(value, values, metric) {
+        const min = Math.min(...values);
+        const max = Math.max(...values);
 
-  const max = Math.max(...values);
+        if (max === min) return "#64748b";
+
+        const normalized = (value - min) / (max - min);
+
+  // Lower values are more favorable for these metrics.
+        const lowerIsBetter = [
+            "median_gross_rent",
+            "median_rent_burden_pct",
+            "median_network_transit_distance_m",
+            "food_access_beyond_half_mile_network_share"
+        ];
+        const score = lowerIsBetter.includes(metric)
+            ? 1 - normalized
+            : normalized;
+
+        if (score < 0.2) return "#edf8fb";
+        if (score < 0.4) return "#b2e2e2";
+        if (score < 0.6) return "#66c2a4";
+        if (score < 0.8) return "#2ca25f";
+
+        return "#006d2c";
+    }
 
 
+function addLegend(metric) {
+  const values = getValues(metric);
+  const legend = document.getElementById("map-legend");
 
-  if (max === min) return "#64748b";
+  if (values.length === 0) {
+    legend.innerHTML = "";
+    return;
+  }
 
+  const min = Math.min(...values);
+  const max = Math.max(...values);
 
+  const colors = [
+    "#edf8fb",
+    "#b2e2e2",
+    "#66c2a4",
+    "#2ca25f",
+    "#006d2c"
+  ];
 
-  const normalized = (value - min) / (max - min);
+  const format = metricInfo[metric].format;
 
+  legend.innerHTML = `
+    <div class="legend-title">
+      ${metricInfo[metric].label}
+    </div>
 
+    <div class="legend-scale">
+      ${colors.map(color => `
+        <div
+          class="legend-color"
+          style="background:${color}"
+        ></div>
+      `).join("")}
+    </div>
 
-  if (normalized < .2) return "#edf8fb";
+    <div class="legend-labels">
+      <span>${format(min)}</span>
+      <span>${format(max)}</span>
+    </div>
 
-  if (normalized < .4) return "#b2e2e2";
+    <div class="comparison-legend">
+      <div class="comparison-legend-item">
+        <span class="comparison-legend-swatch tract-one-swatch"></span>
+        <span>Tract 1</span>
+      </div>
 
-  if (normalized < .6) return "#66c2a4";
-
-  if (normalized < .8) return "#2ca25f";
-
-
-
-  return "#006d2c";
-
+      <div class="comparison-legend-item">
+        <span class="comparison-legend-swatch tract-two-swatch"></span>
+        <span>Tract 2</span>
+      </div>
+    </div>
+  `;
 }
 
 
 
 function styleFeature(feature) {
+  const metric = document.getElementById("metric").value;
+  const values = getValues(metric);
+  const value = feature.properties[metric];
+  const geoid = String(feature.properties.GEOID);
 
+  let outlineColor = "#ffffff";
+  let outlineWeight = 1;
 
+  if (geoid === String(comparisonTractOne)) {
+    outlineColor = "#e63946";
+    outlineWeight = 4;
+  } else if (geoid === String(comparisonTractTwo)) {
+    outlineColor = "#2563eb";
+    outlineWeight = 4;
+  }
 
-  const metric = document.getElementById("metric").value;
-
-  const values = getValues(metric);
-
-  const value = feature.properties[metric];
-
-
-
-  return {
-
-
-
-    fillColor:
-
-      value === null || value === undefined
-
-        ? "#d1d5db"
-
-        : getColor(value, values),
-
-
-
-    weight: 1,
-
-    color: "#ffffff",
-
-    fillOpacity: .75
-
-
-
-  };
-
-
-
+  return {
+    fillColor:
+      value === null || value === undefined
+        ? "#d1d5db"
+        : getColor(value, values, metric),
+    weight: outlineWeight,
+    color: outlineColor,
+    fillOpacity: 0.75
+  };
 }
 
 
+function addLegend(metric) {
+    const oldLegend = document.querySelector(".map-legend");
+
+    if (oldLegend) {
+        oldLegend.remove();
+    }
+
+    const values = getValues(metric);
+
+    if (!values.length) return;
+
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+
+    const legend = L.control({ position: "bottomright" });
+
+    legend.onAdd = function() {
+        const div = L.DomUtil.create("div", "map-legend");
+
+        div.innerHTML = `
+            <div class="legend-title">
+                ${metricInfo[metric].label}
+            </div>
+
+            <div class="legend-scale">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="legend-labels">
+                <span>${metricInfo[metric].format(min)}</span>
+                <span>${metricInfo[metric].format(max)}</span>
+            </div>
+        `;
+
+        return div;
+    };
+
+    legend.addTo(map);
+}
 
 function updateMap() {
 
@@ -818,11 +1632,13 @@ function updateMap() {
 
 
 
-          click: function() {
 
-            showSelectedArea(p);
+          click: function() {
+            selectTractFromMap(p);
+            showSelectedArea(p);
+            showSelectedInsight(p);
+          }
 
-          }
 
 
 
@@ -838,7 +1654,7 @@ function updateMap() {
 
   ).addTo(map);
 
-
+addLegend(metric);
 
 }
 
@@ -847,125 +1663,490 @@ function updateMap() {
 function showSelectedArea(p) {
 
 
+  function getPercentile(metric, value) {
 
-  document.getElementById("selected-info").innerHTML = `
+    if (value == null || isNaN(value)) {
+      return null;
+    }
 
+    const values = geojsonData.features
+      .map(feature => Number(feature.properties[metric]))
+      .filter(value => !isNaN(value));
 
+    if (values.length === 0) {
+      return null;
+    }
 
-    <div class="metric">
+    const belowOrEqual = values.filter(
+      currentValue => currentValue <= Number(value)
+    ).length;
 
-      <div class="metric-label">Selected Tract</div>
+    return Math.round(
+      (belowOrEqual / values.length) * 100
+    );
+  }
 
-      <div class="metric-value">
 
-        ${p.GEOID || "Unknown"}
+  function formatMetric(metric, value) {
 
-      </div>
+    if (value == null || value === undefined || isNaN(value)) {
+      return "—";
+    }
 
-    </div>
+    if (metric === "median_gross_rent") {
+      return "$" + Math.round(Number(value)).toLocaleString();
+    }
 
+    if (metric === "median_rent_burden_pct") {
+      return Number(value).toFixed(1) + "%";
+    }
 
+    if (metric === "median_network_transit_distance_m") {
+      return Math.round(Number(value)).toLocaleString() + " m";
+    }
 
-    <div class="metric">
+    if (metric === "food_access_beyond_half_mile_network_share") {
+      return Number(value).toFixed(1) + "%";
+    }
 
-      <div class="metric-label">Median Rent</div>
+    if (metric === "vehicle_access_pct") {
+      return Number(value).toFixed(1) + "%";
+    }
 
-      <div class="metric-value">
+    return Number(value).toLocaleString();
+  }
 
-        ${
 
-          p.median_gross_rent == null
+  function createMetric(metric, label) {
 
-            ? "—"
+    const value = p[metric];
+    const percentile = getPercentile(metric, value);
 
-            : "$" + Number(p.median_gross_rent).toLocaleString()
+    return `
+      <div class="selected-metric">
 
-        }
+        <div class="selected-metric-header">
 
-      </div>
+          <div class="metric-label">
+            ${label}
+          </div>
 
-    </div>
+          <div class="metric-value">
+            ${formatMetric(metric, value)}
+          </div>
 
+        </div>
 
+        ${
+          percentile === null
+            ? ""
+            : `
+              <div class="percentile-label">
+                ${percentile}th percentile in study area
+              </div>
 
-    <div class="metric">
+              <div class="percentile-track">
+                <div
+                  class="percentile-fill"
+                  style="width:${percentile}%"
+                ></div>
+              </div>
+            `
+        }
 
-      <div class="metric-label">Network Transit Distance</div>
+      </div>
+    `;
+  }
 
-      <div class="metric-value">
 
-        ${
+  document.getElementById("selected-info").innerHTML = `
 
-          p.median_network_transit_distance_m == null
+    <div class="selected-tract-header">
 
-            ? "—"
+      <div class="metric-label">
+        Census Tract
+      </div>
 
-            : Math.round(
+      <div class="selected-tract-id">
+        ${p.GEOID || "Unknown"}
+      </div>
 
-                Number(p.median_network_transit_distance_m)
+    </div>
 
-              ).toLocaleString() + " m"
 
-        }
+    ${createMetric(
+      "median_gross_rent",
+      "Median Rent"
+    )}
 
-      </div>
 
-    </div>
+    ${createMetric(
+      "median_rent_burden_pct",
+      "Rent Burden"
+    )}
 
 
+    ${createMetric(
+      "median_network_transit_distance_m",
+      "Network Transit Distance"
+    )}
 
-    <div class="metric">
 
-      <div class="metric-label">Food Access</div>
+    ${createMetric(
+      "food_access_beyond_half_mile_network_share",
+      "Food Access"
+    )}
 
-      <div class="metric-value">
 
-        ${
+    ${createMetric(
+      "vehicle_access_pct",
+      "Vehicle Access"
+    )}
 
-          p.food_access_beyond_half_mile_network_share == null
+  `;
 
-            ? "—"
 
-            : Number(
+  // Create comparison insight
 
-                p.food_access_beyond_half_mile_network_share
+  const rent = Number(p.median_gross_rent);
+  const transit = Number(p.median_network_transit_distance_m);
+  const food = Number(
+    p.food_access_beyond_half_mile_network_share
+  );
 
-              ).toFixed(1) + "%"
 
-        }
+  const rentValues = getValues("median_gross_rent");
+  const transitValues = getValues(
+    "median_network_transit_distance_m"
+  );
+  const foodValues = getValues(
+    "food_access_beyond_half_mile_network_share"
+  );
 
-      </div>
 
-    </div>
+  function calculateMedian(values) {
 
+    const sorted = [...values].sort(
+      (a, b) => a - b
+    );
 
+    const middle = Math.floor(
+      sorted.length / 2
+    );
 
-    <div class="metric">
+    return sorted.length % 2
+      ? sorted[middle]
+      : (sorted[middle - 1] + sorted[middle]) / 2;
+  }
 
-      <div class="metric-label">Vehicle Access</div>
 
-      <div class="metric-value">
+  const medianRent = calculateMedian(rentValues);
+  const medianTransit = calculateMedian(transitValues);
+  const medianFood = calculateMedian(foodValues);
 
-        ${
 
-          p.vehicle_access_pct == null
+  const insights = [];
 
-            ? "—"
 
-            : Number(p.vehicle_access_pct).toFixed(1) + "%"
+  if (!isNaN(rent)) {
 
-        }
+    insights.push(
+      rent > medianRent
+        ? "Rent is above the study-area median."
+        : "Rent is below the study-area median."
+    );
 
-      </div>
+  }
 
-    </div>
 
+  if (!isNaN(transit)) {
 
+    insights.push(
+      transit > medianTransit
+        ? "Transit access is relatively distant compared with the study area."
+        : "Transit access is relatively close compared with the study area."
+    );
 
-  `;
+  }
 
 
+  if (!isNaN(food)) {
 
+    insights.push(
+      food > medianFood
+        ? "Food access is above the study-area median."
+        : "Food access is below the study-area median."
+    );
+
+  }
+
+
+  document.getElementById(
+    "selected-insight"
+  ).innerHTML = `
+
+    <strong>Key insight</strong>
+
+    <p>
+      ${insights.join(" ")}
+    </p>
+
+  `;
+
+}
+
+function showSelectedInsight(p) {
+
+  const rent = Number(p.median_gross_rent);
+  const transit = Number(p.median_network_transit_distance_m);
+  const food = Number(
+    p.food_access_beyond_half_mile_network_share
+  );
+
+  const rentValues = getValues("median_gross_rent");
+  const transitValues = getValues(
+    "median_network_transit_distance_m"
+  );
+  const foodValues = getValues(
+    "food_access_beyond_half_mile_network_share"
+  );
+
+  function getMedian(values) {
+
+    const sorted = [...values].sort((a, b) => a - b);
+
+    const middle = Math.floor(sorted.length / 2);
+
+    return sorted.length % 2
+      ? sorted[middle]
+      : (sorted[middle - 1] + sorted[middle]) / 2;
+  }
+
+  const medianRent = getMedian(rentValues);
+  const medianTransit = getMedian(transitValues);
+  const medianFood = getMedian(foodValues);
+
+  const insights = [];
+
+  if (!isNaN(rent)) {
+
+    insights.push(
+      rent > medianRent
+        ? "Rent is above the study-area median."
+        : "Rent is below the study-area median."
+    );
+
+  }
+
+  if (!isNaN(transit)) {
+
+    insights.push(
+      transit > medianTransit
+        ? "Transit access is relatively distant compared with the study area."
+        : "Transit access is relatively close compared with the study area."
+    );
+
+  }
+
+  if (!isNaN(food)) {
+
+    insights.push(
+      food > medianFood
+        ? "Food access is above the study-area median."
+        : "Food access is below the study-area median."
+    );
+
+  }
+
+  const insightElement = document.getElementById("selected-insight-text");
+
+  if (insightElement) {
+    insightElement.textContent = insights.join(" ");
+  }
+}
+
+function populateComparisonSelectors() {
+
+  const tractOne = document.getElementById("tract-one");
+  const tractTwo = document.getElementById("tract-two");
+
+  geojsonData.features.forEach(feature => {
+
+    const geoid = feature.properties.GEOID;
+
+    if (!geoid) {
+      return;
+    }
+
+    const optionOne = document.createElement("option");
+    optionOne.value = geoid;
+    optionOne.textContent = geoid;
+
+    const optionTwo = document.createElement("option");
+    optionTwo.value = geoid;
+    optionTwo.textContent = geoid;
+
+    tractOne.appendChild(optionOne);
+    tractTwo.appendChild(optionTwo);
+
+  });
+
+}
+
+function updateComparison() {
+
+  const tractOneId = document.getElementById("tract-one").value;
+  const tractTwoId = document.getElementById("tract-two").value;
+
+  const results = document.getElementById("comparison-results");
+
+  if (!tractOneId || !tractTwoId) {
+
+    results.innerHTML = `
+      <p class="comparison-placeholder">
+        Select two census tracts to compare them.
+      </p>
+    `;
+
+    return;
+  }
+
+  const tractOne = geojsonData.features.find(
+    feature => String(feature.properties.GEOID) === String(tractOneId)
+  );
+
+  const tractTwo = geojsonData.features.find(
+    feature => String(feature.properties.GEOID) === String(tractTwoId)
+  );
+
+  if (!tractOne || !tractTwo) {
+    return;
+  }
+
+  const p1 = tractOne.properties;
+  const p2 = tractTwo.properties;
+
+  function formatRent(value) {
+    return value == null || isNaN(value)
+      ? "—"
+      : "$" + Math.round(Number(value)).toLocaleString();
+  }
+
+  function formatPercent(value) {
+    return value == null || isNaN(value)
+      ? "—"
+      : Number(value).toFixed(1) + "%";
+  }
+
+  function formatDistance(value) {
+    return value == null || isNaN(value)
+      ? "—"
+      : Math.round(Number(value)).toLocaleString() + " m";
+  }
+
+	results.innerHTML = `
+
+		<table class="comparison-table">
+
+			<thead>
+				<tr>
+					<th>Metric</th>
+					<th>Tract ${p1.GEOID}</th>
+					<th>Tract ${p2.GEOID}</th>
+				</tr>
+			</thead>
+
+			<tbody>
+
+				<tr>
+					<td class="metric-name">Median Rent</td>
+					<td class="metric-number">${formatRent(p1.median_gross_rent)}</td>
+					<td class="metric-number">${formatRent(p2.median_gross_rent)}</td>
+				</tr>
+
+				<tr>
+					<td class="metric-name">Rent Burden</td>
+					<td class="metric-number">${formatPercent(p1.median_rent_burden_pct)}</td>
+					<td class="metric-number">${formatPercent(p2.median_rent_burden_pct)}</td>
+				</tr>
+
+				<tr>
+					<td class="metric-name">Transit Distance</td>
+					<td class="metric-number">${formatDistance(p1.median_network_transit_distance_m)}</td>
+					<td class="metric-number">${formatDistance(p2.median_network_transit_distance_m)}</td>
+				</tr>
+
+				<tr>
+					<td class="metric-name">Food Access</td>
+					<td class="metric-number">${formatPercent(p1.food_access_beyond_half_mile_network_share)}</td>
+					<td class="metric-number">${formatPercent(p2.food_access_beyond_half_mile_network_share)}</td>
+				</tr>
+
+				<tr>
+					<td class="metric-name">Vehicle Access</td>
+					<td class="metric-number">${formatPercent(p1.vehicle_access_pct)}</td>
+					<td class="metric-number">${formatPercent(p2.vehicle_access_pct)}</td>
+				</tr>
+
+			</tbody>
+
+		</table>
+
+	`;
+
+}
+
+
+  document
+    .getElementById("tract-one")
+    .addEventListener("change", function() {
+      comparisonTractOne = this.value || null;
+
+      updateComparison();
+
+     if (geojsonLayer) {
+        geojsonLayer.setStyle(styleFeature);
+      }
+    });
+
+  document
+    .getElementById("tract-two")
+    .addEventListener("change", function() {
+      comparisonTractTwo = this.value || null;
+
+      updateComparison();
+
+      if (geojsonLayer) {
+        geojsonLayer.setStyle(styleFeature);
+      }
+    });
+
+
+
+function selectTractFromMap(p) {
+  const tractOne = document.getElementById("tract-one");
+  const tractTwo = document.getElementById("tract-two");
+  const clickedId = String(p.GEOID);
+
+  if (tractOne.value && tractTwo.value) {
+    tractOne.value = clickedId;
+    tractTwo.value = "";
+  } else if (!tractOne.value) {
+    tractOne.value = clickedId;
+  } else if (tractOne.value !== clickedId) {
+    tractTwo.value = clickedId;
+  } else {
+    return;
+  }
+
+  comparisonTractOne = tractOne.value || null;
+  comparisonTractTwo = tractTwo.value || null;
+
+  updateComparison();
+
+  if (geojsonLayer) {
+    geojsonLayer.setStyle(styleFeature);
+  }
 }
 
 
@@ -1102,6 +2283,8 @@ fetch("data/college_town_data.geojson")
 
     updateMap();
 
+    populateComparisonSelectors();
+
 
 
   })
@@ -1155,5 +2338,3 @@ document
 </body>
 
 </html>
-
-</body>

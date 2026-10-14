@@ -35,10 +35,16 @@ def build_college_town_dataset() -> None:
 
     dataset = data[REQUIRED_COLUMNS].copy()
 
+
+    income = dataset["median_household_income"]
+
+    valid_income = income.where(income > 0)
+
     dataset["annual_rent_to_income_ratio"] = (
         dataset["median_gross_rent"] * 12
-        / dataset["median_household_income"]
+        / valid_income
     )
+
 
     dataset = gpd.GeoDataFrame(
         dataset,

@@ -22,17 +22,21 @@ def engineer_housing_features(
     features["households_without_vehicle"] = features["B08201_002E"]
     features["total_households_vehicle"] = features["B08201_001E"]
 
+
+    valid_households = features["total_households_vehicle"].where(
+        features["total_households_vehicle"] > 0
+    )
+
     features["vehicle_access_pct"] = (
         100
         * (
             features["total_households_vehicle"]
             - features["households_without_vehicle"]
         )
-        / features["total_households_vehicle"]
+        / valid_households
     )
 
     return features
-
 
 def save_features(dataset: gpd.GeoDataFrame) -> None:
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)

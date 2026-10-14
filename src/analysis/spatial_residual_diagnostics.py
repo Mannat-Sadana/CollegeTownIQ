@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import numpy as np
 import geopandas as gpd
 import statsmodels.api as sm
 from libpysal.weights import Queen
@@ -45,6 +45,8 @@ def main() -> None:
     )
 
     weights.transform = "r"
+
+    np.random.seed(42)
 
     moran = Moran(
         analysis_data["residual"],

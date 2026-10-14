@@ -158,6 +158,7 @@ def calculate_spatial_diagnostics(
         geometry_data,
         use_index=False,
     )
+    weights.transform = "r"
 
     np.random.seed(42)
 
