@@ -290,6 +290,16 @@ python -m http.server 8000
 
 Then open `http://localhost:8000/dashboard/` in your browser.
 
+### Robustness Check: Housing Tenure
+
+The initial regression showed a negative association between distance to public transit and median gross rent. However, after adding renter share as a control variable, the transit-distance coefficient decreased from approximately −$35.40 to −$18.93 per kilometer and became statistically insignificant (p = 0.4801).
+
+When both renter share and the college-enrollment proxy were included, the coefficient decreased further to −$12.59 per kilometer (p = 0.6281).
+
+These findings suggest that housing tenure may partly account for the original association. However, the analysis uses only 25 observations, and the observational design does not establish causality. The results should therefore be interpreted cautiously.
+
+Detailed results are available in `docs/confounding_check.csv`.
+
 ## Limitations and Future Improvements
 
 Several limitations matter when interpreting the results:

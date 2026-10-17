@@ -35,6 +35,23 @@ def build_analysis_dataset() -> gpd.GeoDataFrame:
         errors="ignore",
     )
 
+    features = gpd.read_file(
+        "data/processed/college_town_features.gpkg"
+    )[
+        [
+            "GEOID",
+            "renter_share_pct",
+            "college_enrollment_share_pct",
+        ]
+    ]
+
+    dataset = dataset.merge(
+        features,
+        on="GEOID",
+        how="inner",
+        validate="one_to_one",
+    )
+
     dataset = dataset.merge(
         accessibility,
         on="GEOID",

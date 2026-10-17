@@ -22,7 +22,6 @@ def engineer_housing_features(
     features["households_without_vehicle"] = features["B08201_002E"]
     features["total_households_vehicle"] = features["B08201_001E"]
 
-
     valid_households = features["total_households_vehicle"].where(
         features["total_households_vehicle"] > 0
     )
@@ -36,19 +35,42 @@ def engineer_housing_features(
         / valid_households
     )
 
+    # Renter-occupied share of occupied housing units
+    features["renter_share_pct"] = (
+        100
+        * features["B25003_003E"]
+        / features["B25003_001E"].where(features["B25003_001E"] > 0)
+    )
+
+    # College enrollment counts as a share of total tract population.
+    population = features["B01003_001E"].where(
+        features["B01003_001E"] > 0
+    )
+    features["college_enrollment_share_pct"] = (
+        100
+        * (features["B14007_008E"] + features["B14007_009E"])
+        / population
+    )
+
     return features
+
 
 def save_features(dataset: gpd.GeoDataFrame) -> None:
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-
     dataset.to_file(
         OUTPUT_PATH,
         layer="college_town_features",
         driver="GPKG",
     )
-
     print(f"Saved engineered dataset to {OUTPUT_PATH}")
     print(f"Rows: {len(dataset)}")
+    print("New controls:")
+    print(features_summary(dataset))
+
+
+def features_summary(dataset: gpd.GeoDataFrame) -> str:
+    columns = ["renter_share_pct", "college_enrollment_share_pct"]
+    return dataset[columns].describe().round(2).to_string()
 
 
 if __name__ == "__main__":
