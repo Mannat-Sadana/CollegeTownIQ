@@ -37,7 +37,7 @@ Compare two census tracts across median rent, rent burden, transit distance, foo
 
 ### 1. Housing costs
 
-![Median gross rent by census tract](docs/figures/maps/median_gross_rent_map.png)
+![Housing affordability dashboard](docs/figures/dashboard_preview_2.png)
 
 *Median gross rent by census tract, based on the 2024 American Community Survey 5-Year Estimates.*
 
@@ -45,7 +45,7 @@ Housing costs vary across the study area, which is why I wanted to examine indiv
 
 ### 2. Public transportation accessibility
 
-![Transit accessibility by census tract](docs/figures/maps/transit_accessibility_map.png)
+![Transit accessibility dashboard](docs/figures/transit_dashboard.png)
 
 *Transit accessibility across the study area. The project examines both straight-line distance and pedestrian-network distance, which represent different ways of measuring accessibility.*
 
@@ -53,7 +53,7 @@ A straight-line distance doesn't necessarily represent the route someone would a
 
 ### 3. Food accessibility
 
-![Food access by census tract](docs/figures/maps/food_access_map.png)
+![Food accessibility dashboard](docs/figures/food_access_dashboard.png)
 
 *Geographic variation in the food-access measure used in the project.*
 
