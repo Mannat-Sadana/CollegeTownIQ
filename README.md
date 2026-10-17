@@ -245,21 +245,50 @@ The live dashboard is available here:
 
 **[CollegeTownIQ Dashboard](https://mannat-sadana.github.io/CollegeTownIQ/dashboard/)**
 
-If you want to explore the code locally, start by cloning the repository and installing the Python dependencies.
+### Set up the environment
+
+Clone the repository and install the Python dependencies in a virtual environment:
 
 ```bash
 git clone https://github.com/Mannat-Sadana/CollegeTownIQ.git
 cd CollegeTownIQ
 
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
-The commands above set up the Python environment. Reproducing the full analysis also requires the source datasets and intermediate files expected by the processing scripts.
+### Data requirements
 
-The repository includes the dashboard's exported GeoJSON data, so the dashboard can be explored separately from the full geospatial processing workflow. For local browser testing, serve the project through a local web server rather than relying on a direct file URL.
+The dashboard can be explored independently using the exported GeoJSON file included in the repository. Reproducing the full analysis requires the source datasets and intermediate files expected by the scripts. Some raw data and processed outputs are not tracked in Git.
+
+Before running the processing pipeline, make sure the required ACS data, Census TIGER/Line shapefiles, CATA GTFS files, and food-access data are available in the paths expected by the scripts.
+
+### Reproducing the analysis
+
+Run the processing scripts from the repository root, with the virtual environment activated. The general workflow is:
+
+1. Clean the ACS data and construct the census-tract dataset.
+2. Build the study area and process CATA transit stops and service data.
+3. Calculate transit accessibility and assemble the analysis dataset.
+4. Build the walking-network accessibility and food-access datasets.
+5. Assemble the master dataset and run the statistical analyses.
+6. Export the dashboard data and regenerate the figures as needed.
+
+The 250 m and 500 m straight-line accessibility measures support a sensitivity analysis that checks whether the main regression results are consistent across grid resolutions. Run the relevant accessibility scripts before the analysis scripts that depend on their outputs.
+
+For exact input paths and output filenames, refer to each script's constants and data-loading functions. Not every intermediate dataset is included in the repository, so the full workflow may require obtaining the original data and generating intermediate files first.
+
+### Preview the dashboard locally
+
+The dashboard uses the exported GeoJSON data in `dashboard/data/college_town_data.geojson`. To preview it locally, start a web server from the repository root rather than opening the HTML file directly:
+
+```bash
+python -m http.server 8000
+```
+
+Then open `http://localhost:8000/dashboard/` in your browser.
 
 ## Limitations and Future Improvements
 
