@@ -17,19 +17,21 @@ The goal isn't to identify one universally "best" neighborhood. Instead, I wante
 
 ## Explore the dashboard
 
-**[Open the CollegeTownIQ Interactive Dashboard →](https://mannat-sadana.github.io/CollegeTownIQ/dashboard/)**
+## Interactive Dashboard
 
-The dashboard lets users explore census tracts across the State College study area and compare different aspects of housing and accessibility.
+[**Explore the live CollegeTownIQ dashboard →**](https://mannat-sadana.github.io/CollegeTownIQ/dashboard/)
 
-Some of the features include:
+CollegeTownIQ is an interactive geospatial dashboard for exploring how housing costs and access to transportation and essential resources vary across State College, Pennsylvania.
 
-- Exploring geographic differences using an interactive map.
-- Switching between different metrics and their corresponding map legends.
-- Selecting two census tracts to compare their characteristics.
-- Viewing additional information about a selected area.
-- Comparing housing costs, transit accessibility, food access, and vehicle access.
+### Explore housing affordability geographically
 
-I wanted the dashboard to make the analysis easier to explore rather than requiring someone to read through a statistical report first.
+![CollegeTownIQ housing affordability map](docs/figures/dashboard_preview.png)
+
+### Compare census tracts
+
+Compare two census tracts across median rent, rent burden, transit distance, food access, and vehicle access to explore how local conditions differ.
+
+![CollegeTownIQ census tract comparison](docs/figures/tract_comparison.png)
 
 ## A look at the study area
 
