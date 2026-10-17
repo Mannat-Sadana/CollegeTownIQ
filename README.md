@@ -33,6 +33,39 @@ Compare two census tracts across median rent, rent burden, transit distance, foo
 
 ![CollegeTownIQ census tract comparison](docs/figures/tract_comparison.png)
 
+## Key Research Findings
+
+CollegeTownIQ examines the relationship between housing costs and public transit accessibility across 28 census tracts in the State College, Pennsylvania area. The primary regression uses 25 complete observations.
+
+### Main finding
+
+In the primary regression, greater straight-line distance to the nearest CATA transit stop was associated with lower median gross rent, after accounting for median household income and vehicle access.
+
+- **Estimated association:** Approximately $35 lower median gross rent per additional kilometer of transit distance.
+- **Robust p-value:** 0.0066.
+- **Model R²:** 0.1902.
+- **Sensitivity check:** The estimated association remained similar when transit distance was recalculated using a 500-meter sampling resolution.
+
+These results suggest a relationship between housing costs and transit accessibility within the study area. They do not establish that distance from transit causes rents to decrease.
+
+## Methodology and Robustness Checks
+
+I built a geospatial workflow that combines public datasets, constructs tract-level accessibility measures, and evaluates the relationship between housing costs and transit access.
+
+1. **Data integration:** Combined 2024 American Community Survey 5-Year Estimates, CATA transit data, food-access data, census boundaries, and geographic datasets.
+2. **Geospatial processing:** Defined a study area covering State College Borough, College Township, Ferguson Township, Harris Township, and Patton Township.
+3. **Feature engineering:** Calculated housing, socioeconomic, transit-accessibility, and food-access measures at the census-tract level.
+4. **Statistical modeling:** Estimated a regression relating median gross rent to transit distance, median household income, and vehicle access.
+5. **Robustness checks:** Evaluated alternative transit-distance sampling resolutions, influential observations, and spatial residual patterns.
+
+### Diagnostic results
+
+- The estimated transit-distance association remained similar using a 500-meter sampling resolution.
+- The association persisted after excluding two potentially influential observations, with 23 observations remaining.
+- The spatial residual diagnostic did not detect statistically significant spatial autocorrelation in the tested model.
+
+These checks help assess the stability of the findings, but they do not eliminate every source of uncertainty or establish causation.
+
 ## A look at the study area
 
 ### 1. Housing costs
@@ -228,18 +261,18 @@ The commands above set up the Python environment. Reproducing the full analysis 
 
 The repository includes the dashboard's exported GeoJSON data, so the dashboard can be explored separately from the full geospatial processing workflow. For local browser testing, serve the project through a local web server rather than relying on a direct file URL.
 
-## Limitations and things I'd improve next
+## Limitations and Future Improvements
 
-This project has taught me a lot, but there are still limitations I'd like to address.
+Several limitations matter when interpreting the results:
 
-- **Small regression sample:** The primary model uses only 25 complete census-tract observations, so estimates may be sensitive to the particular areas included.
-- **Missing data:** Some housing and socioeconomic variables are unavailable for certain tracts. I document missingness rather than treating every missing value as zero.
-- **Geographic aggregation:** Census-tract averages do not describe every household or individual living in an area.
-- **Distance measures:** Straight-line distance and pedestrian-network distance measure different things. Neither automatically represents actual travel time or the quality of transit service.
-- **Observational analysis:** The model identifies an association and does not establish causation.
-- **Additional explanatory factors:** The current model does not capture every factor that could influence rent, such as housing characteristics, neighborhood amenities, or local market conditions.
+- **Small sample:** The primary regression uses 25 complete census-tract observations, so estimates may be sensitive to the areas included.
+- **Observational design:** The analysis identifies associations, not causal effects.
+- **Geographic aggregation:** Census-tract statistics do not describe every household or individual within an area.
+- **Accessibility assumptions:** Straight-line distance and pedestrian-network distance represent different measures. Neither directly captures actual travel time, service quality, or every individual's access to transit.
+- **Missing data:** Some housing and socioeconomic variables are unavailable for certain tracts, reducing the number of observations available for the regression.
+- **Unobserved factors:** Housing characteristics, neighborhood amenities, land use, and other local conditions may also influence rent.
 
-If I continue developing CollegeTownIQ, I'd like to investigate additional explanatory variables, improve the treatment of missing data, and explore ways to make the accessibility measures more representative of actual travel conditions.
+Future improvements could incorporate additional explanatory variables, refine accessibility measures, and expand the analysis to a larger geographic area.
 
 ## Why I built this project
 
