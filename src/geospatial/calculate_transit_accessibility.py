@@ -4,7 +4,9 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 from shapely.geometry import Point
-
+from src.geospatial.select_study_area_tracts import (
+    select_majority_overlap_tracts,
+)
 
 TRACTS_PATH = Path(
     "data/raw/tiger_2024_pa_tracts/tl_2024_42_tract.shp"
@@ -23,22 +25,26 @@ def load_study_area() -> gpd.GeoDataFrame:
     return gpd.read_file(STUDY_AREA_PATH)
 
 
+
 def load_tracts(
     study_area: gpd.GeoDataFrame,
 ) -> gpd.GeoDataFrame:
     tracts = gpd.read_file(TRACTS_PATH)
-
-    tracts = tracts[tracts["COUNTYFP"] == "027"].copy()
-    tracts = tracts.to_crs(study_area.crs)
-
-    study_area_geometry = study_area.union_all()
-
     tracts = tracts[
-        tracts.geometry.intersects(study_area_geometry)
+        tracts["COUNTYFP"] == "027"
     ].copy()
 
-    return tracts
+    tracts = select_majority_overlap_tracts(
+        tracts,
+        study_area,
+    )
 
+    print(
+        f"Selected study-area tracts: "
+        f"{tracts['GEOID'].nunique()}"
+    )
+
+    return tracts
 
 def load_stops() -> gpd.GeoDataFrame:
     return gpd.read_file(STOPS_PATH)

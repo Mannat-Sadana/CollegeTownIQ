@@ -70,14 +70,19 @@ def build_master_dataset(
         validate="one_to_one",
     )
 
-    if len(dataset) != 28:
+    if dataset.empty:
         raise ValueError(
-            f"Expected 28 tracts, found {len(dataset)}."
+            "The dataset contains no study-area tracts."
         )
 
-    if dataset["GEOID"].nunique() != 28:
+    if dataset["GEOID"].isna().any():
         raise ValueError(
-            "GEOID uniqueness check failed."
+            "Missing GEOID values found."
+        )
+
+    if dataset["GEOID"].duplicated().any():
+        raise ValueError(
+            "Duplicate GEOID values found."
         )
 
     required_columns = [

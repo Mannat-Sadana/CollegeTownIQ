@@ -2,7 +2,9 @@ from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
-
+from src.geospatial.select_study_area_tracts import (
+    select_majority_overlap_tracts,
+)
 
 TRACTS_PATH = Path(
     "data/raw/tiger_2024_pa_tracts/tl_2024_42_tract.shp"
@@ -16,8 +18,16 @@ OUTPUT_PATH = Path("data/processed/transit_frequency.gpkg")
 def calculate_transit_frequency() -> None:
     # Load actual Census tract polygons
     tracts = gpd.read_file(TRACTS_PATH)
-
     tracts = tracts[tracts["COUNTYFP"] == "027"].copy()
+
+    study_area = gpd.read_file("data/processed/study_area.gpkg")
+
+    tracts = select_majority_overlap_tracts(
+        tracts,
+        study_area,
+    )
+
+    print(f"Selected study-area tracts: {tracts['GEOID'].nunique()}")
 
     # Load CATA stop locations
     stops = gpd.read_file(STOPS_PATH)

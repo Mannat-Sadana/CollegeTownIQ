@@ -6,8 +6,8 @@ This report summarizes the descriptive, geospatial, and statistical analysis per
 
 ## 1. Study Coverage
 
-- Study-area observations: **28 census tracts**
-- Complete observations used in the primary statistical model: **25**
+- Study-area observations: **23 census tracts**
+- Complete observations used in the primary statistical model: **21**
 - Geographic unit: 2024 Census tracts intersecting the CollegeTownIQ study area
 - Study area: State College Borough, College Township, Ferguson Township, Harris Township, and Patton Township
 
@@ -30,7 +30,7 @@ A 500-meter sampling resolution was evaluated as a sensitivity check.
 - A separate pedestrian-network analysis provides a different accessibility perspective.
 - Straight-line and network measures are kept conceptually separate because they represent different accessibility assumptions.
 
-- Median primary transit-distance measure: **423.3 meters**
+- Median primary transit-distance measure: **311.2 meters**
 
 ## 4. Food Access
 
@@ -44,10 +44,10 @@ Food access is used as a complementary analysis rather than as a predictor in th
 
 Pearson correlations are used to describe relationships among tract-level variables.
 
-- Median gross rent vs. 250m sampled straight-line transit distance: **r = -0.391**
-- Median gross rent vs. median household income: **r = 0.092**
-- Median rent burden vs. median household income: **r = -0.728**
-- Median rent burden vs. 250m sampled straight-line transit distance: **r = -0.410**
+- Median gross rent vs. 250m sampled straight-line transit distance: **r = 0.076**
+- Median gross rent vs. median household income: **r = 0.140**
+- Median rent burden vs. median household income: **r = -0.792**
+- Median rent burden vs. 250m sampled straight-line transit distance: **r = -0.337**
 
 These are descriptive associations and should not be interpreted as causal effects.
 
@@ -55,42 +55,42 @@ These are descriptive associations and should not be interpreted as causal effec
 
 The primary model estimates the association between tract-level median gross rent and transit accessibility while controlling for median household income and vehicle access.
 
-- Observations: **25**
-- R²: **0.190**
-- Adjusted R²: **0.075**
-- Overall F-test p-value: **0.0671**
+- Observations: **21**
+- R²: **0.029**
+- Adjusted R²: **-0.143**
+- Overall F-test p-value: **0.6699**
 
 | Predictor | Coefficient | Robust p-value |
 |---|---:|---:|
-| Transit distance (km) | **-35.404** | **0.0066** |
-| Household income ($10,000s) | -2.562 | 0.953 |
-| Vehicle access (%) | 5.260 | 0.575 |
+| Transit distance (km) | **0.518** | **0.9884** |
+| Household income ($10,000s) | -1.696 | 0.975 |
+| Vehicle access (%) | 3.688 | 0.736 |
 
-The estimated coefficient for transit distance corresponds to approximately **$35 lower tract-level median gross rent per additional kilometer of the 250-meter sampled straight-line transit-distance measure**, conditional on the other included variables.
+The estimated coefficient for transit distance corresponds to approximately **$1 lower tract-level median gross rent per additional kilometer of the 250-meter sampled straight-line transit-distance measure**, conditional on the other included variables.
 
 This is an association at the census-tract level, not evidence that increasing or decreasing transit access causes rents to change.
 
 ## 7. Influence and Sensitivity Analysis
 
-- GEOID `42027011903`: Cook's distance ≈ **0.709**
-- GEOID `42027012300`: Cook's distance ≈ **0.424**
+- GEOID `42027011903`: Cook's distance ≈ **0.831**
+- GEOID `42027012300`: Cook's distance ≈ **0.641**
 
 The transit-distance association remained similar when these observations were removed individually or together.
 
 | Scenario | Observations | Transit coefficient | p-value |
 |---|---:|---:|---:|
-| All observations | 25 | -35.40 | 0.0066 |
-| Remove 42027011903 | 24 | -36.05 | 0.0153 |
-| Remove 42027012300 | 24 | -32.70 | 0.0157 |
-| Remove both | 23 | -33.96 | 0.0105 |
+| All observations | 21 | 0.52 | 0.9884 |
+| Remove 42027011903 | 20 | -16.57 | 0.5807 |
+| Remove 42027012300 | 20 | 24.58 | 0.4928 |
+| Remove both | 19 | 4.56 | 0.8697 |
 
 ## 8. Spatial Residual Diagnostics
 
-- Observations: **25**
+- Observations: **21**
 - Neighborhood definition: **Queen contiguity**
-- Average neighbors: **5.04**
-- Moran's I: **-0.1142**
-- Permutation p-value: **0.2700**
+- Average neighbors: **4.86**
+- Moran's I: **-0.0419**
+- Permutation p-value: **0.4770**
 
 The selected test did not detect statistically significant spatial autocorrelation in the primary regression residuals.
 
@@ -114,9 +114,9 @@ The project therefore focuses on identifying **tradeoffs and spatial patterns** 
 ## 11. Important Limitations
 
 - The analysis uses census-tract-level data rather than individual households.
-- Only 25 complete observations are available for the primary regression.
+- Only 21 complete observations are available for the primary regression.
 - Several ACS variables are unavailable for three study-area tracts.
-- The study area contains only 28 tracts, limiting statistical precision.
+- The study area contains only 23 tracts, limiting statistical precision.
 - Straight-line transit distance is not equivalent to walking distance or travel time.
 - The pedestrian-network analysis provides a separate accessibility perspective but does not model individual travel behavior.
 - Food-access measures come from the USDA food-access framework and do not represent every dimension of food availability, quality, or affordability.

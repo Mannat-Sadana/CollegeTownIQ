@@ -2,11 +2,15 @@ from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
+from src.geospatial.select_study_area_tracts import (
+    select_majority_overlap_tracts,
+)
 
 ACS_PATH = Path("data/processed/acs_2024_centre_county_tracts.csv")
 TRACTS_PATH = Path(
     "data/raw/tiger_2024_pa_tracts/tl_2024_42_tract.shp"
 )
+STUDY_AREA_PATH = Path("data/processed/study_area.gpkg")
 OUTPUT_PATH = Path(
     "data/processed/college_town_tracts.gpkg"
 )
@@ -23,9 +27,17 @@ def load_acs_data() -> pd.DataFrame:
     )
 
 
+
 def load_centre_county_tracts() -> gpd.GeoDataFrame:
     tracts = gpd.read_file(TRACTS_PATH)
-    return tracts[tracts["COUNTYFP"] == "027"].copy()
+    tracts = tracts[tracts["COUNTYFP"] == "027"].copy()
+
+    study_area = gpd.read_file(STUDY_AREA_PATH)
+
+    return select_majority_overlap_tracts(
+        tracts,
+        study_area,
+    )
 
 
 def build_geoid(acs_data: pd.DataFrame) -> pd.DataFrame:

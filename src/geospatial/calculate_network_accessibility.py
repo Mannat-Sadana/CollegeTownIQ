@@ -5,7 +5,9 @@ import networkx as nx
 import osmnx as ox
 import pandas as pd
 from shapely.geometry import Point
-
+from src.geospatial.select_study_area_tracts import (
+    select_majority_overlap_tracts,
+)
 
 TRACTS_PATH = Path(
     "data/raw/tiger_2024_pa_tracts/tl_2024_42_tract.shp"
@@ -58,34 +60,21 @@ def load_data():
 
 
 def select_study_area_tracts(
-    study_area,
-    tracts,
-):
+    study_area: gpd.GeoDataFrame,
+    tracts: gpd.GeoDataFrame,
+) -> gpd.GeoDataFrame:
     tracts = tracts[
         tracts["COUNTYFP"] == "027"
     ].copy()
 
-    study_area = study_area.to_crs(
-        tracts.crs
+    tracts = select_majority_overlap_tracts(
+        tracts,
+        study_area,
     )
-
-    study_area_geometry = (
-        study_area.union_all()
-    )
-
-    tracts = tracts[
-        tracts.geometry.intersects(
-            study_area_geometry
-        )
-    ].copy()
 
     # Project tract geometries into meters before
     # generating the 250 m sample grid.
-    tracts = tracts.to_crs(
-        METRIC_CRS
-    )
-
-    return tracts
+    return tracts.to_crs(METRIC_CRS)
 
 
 def create_sample_points(

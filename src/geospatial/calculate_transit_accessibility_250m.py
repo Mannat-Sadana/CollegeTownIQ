@@ -4,6 +4,9 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 from shapely.geometry import Point
+from src.geospatial.select_study_area_tracts import (
+    select_majority_overlap_tracts,
+)
 
 """Calculate straight-line transit accessibility using a 250 m sampling grid."""
 
@@ -28,15 +31,14 @@ def load_tracts(
     study_area: gpd.GeoDataFrame,
 ) -> gpd.GeoDataFrame:
     tracts = gpd.read_file(TRACTS_PATH)
-
-    tracts = tracts[tracts["COUNTYFP"] == "027"].copy()
-    tracts = tracts.to_crs(study_area.crs)
-
-    study_area_geometry = study_area.union_all()
-
     tracts = tracts[
-        tracts.geometry.intersects(study_area_geometry)
+        tracts["COUNTYFP"] == "027"
     ].copy()
+
+    tracts = select_majority_overlap_tracts(
+        tracts,
+        study_area,
+    )
 
     return tracts
 
