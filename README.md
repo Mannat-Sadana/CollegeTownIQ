@@ -1,218 +1,117 @@
 # CollegeTownIQ 🏡
+
 ### Exploring Housing Affordability and Accessibility in State College, Pennsylvania
 
-[**🌐 View the Live Dashboard**](https://mannat-sadana.github.io/CollegeTownIQ/dashboard/) · [View Source Code](https://github.com/Mannat-Sadana/CollegeTownIQ)
+**[🌐 Explore the Live Dashboard](https://mannat-sadana.github.io/CollegeTownIQ/dashboard/)** · [View Source Code](https://github.com/Mannat-Sadana/CollegeTownIQ)
 
----
+**Headline finding:** Across 21 census tracts with complete data, the analysis found no statistically significant association between distance to the nearest CATA transit stop and median gross rent after controlling for household income and vehicle access. The model explains approximately 2.9% of the observed variation in rent, highlighting the limitations of using a small set of tract-level characteristics to explain housing costs.
 
-## What is CollegeTownIQ?
+## Overview
 
-CollegeTownIQ is a data science project I built to explore a question that I find interesting as a college student: **Does living in a cheaper area also mean having less convenient access to public transportation and other essential resources?**
+CollegeTownIQ is a data science project exploring how housing affordability and access to public transportation and essential resources vary across the State College, Pennsylvania area.
 
-I used State College, Pennsylvania, as my case study and combined housing, census, transit, food-access, and geographic data to investigate how these factors vary across the area.
+Rather than relying on a single regional average, I combined census, transit, food-access, and geographic data to examine differences between neighborhoods. The project brings together data engineering, geospatial analysis, statistical modeling, and interactive visualization.
 
-I didn't want to create another project that just takes a dataset, makes a few charts, and stops there. I wanted to work through the different parts of a data science project, from collecting and cleaning data to analyzing it, checking the results, and building an interactive dashboard.
+## Explore the Dashboard
 
-The goal isn't to identify one universally "best" neighborhood. Instead, I wanted to make it easier to explore the tradeoffs between housing costs and accessibility.
-
-## Explore the dashboard
-
-## Interactive Dashboard
-
-[**Explore the live CollegeTownIQ dashboard →**](https://mannat-sadana.github.io/CollegeTownIQ/dashboard/)
-
-CollegeTownIQ is an interactive geospatial dashboard for exploring how housing costs and access to transportation and essential resources vary across State College, Pennsylvania.
-
-### Explore housing affordability geographically
+The interactive dashboard lets you explore housing and accessibility patterns geographically, inspect census-tract metrics, and compare two tracts.
 
 ![CollegeTownIQ housing affordability map](docs/figures/dashboard_preview.png)
 
-### Compare census tracts
-
-Compare two census tracts across median rent, rent burden, transit distance, food access, and vehicle access to explore how local conditions differ.
+*Explore housing affordability across census tracts.*
 
 ![CollegeTownIQ census tract comparison](docs/figures/tract_comparison.png)
 
-## Key Research Findings
+*Compare tracts across housing costs, transit distance, food access, and vehicle access.*
 
-CollegeTownIQ examines the relationship between housing costs and public transit accessibility across 28 census tracts in the State College, Pennsylvania area. The primary regression uses 25 complete observations.
+## Key Findings
 
-### Main finding
+The study area covers **23 census tracts** across five municipalities. The primary regression uses **21 complete observations** because two tracts have missing values in the required ACS housing and socioeconomic variables.
 
-In the primary regression, greater straight-line distance to the nearest CATA transit stop was associated with lower median gross rent, after accounting for median household income and vehicle access.
+| Measure | Result |
+|---|---:|
+| Census tracts in study area | 23 |
+| Complete observations in primary regression | 21 |
+| Median tract-level gross rent | $1,214/month |
+| Median tract-level household income | $84,063/year |
+| Median tract-level sampled straight-line transit distance (all 23 tracts) | 282.7 m |
+| Primary model R² | 0.029 |
+| Transit-distance coefficient | +$0.518 per additional km |
+| Robust p-value for transit distance | 0.9884 |
 
-- **Estimated association:** Approximately $35 lower median gross rent per additional kilometer of transit distance.
-- **Robust p-value:** 0.0066.
-- **Model R²:** 0.1902.
-- **Sensitivity check:** The estimated association remained similar when transit distance was recalculated using a 500-meter sampling resolution.
+*Housing and socioeconomic measures use the 2024 American Community Survey (ACS) 5-Year Estimates. The reported rent and income figures are medians of tract-level estimates, not individual household values.*
 
-These results suggest a relationship between housing costs and transit accessibility within the study area. They do not establish that distance from transit causes rents to decrease.
+### Interpreting the results
 
-## Methodology and Robustness Checks
+- **Housing costs vary geographically.** Median gross rent ranges from $674 to $1,924 per month across the observed tracts.
+- **The transit–rent association is not statistically significant.** After controlling for median household income and vehicle access, the estimated transit-distance coefficient is close to zero.
+- **Other factors may matter.** Housing characteristics, neighborhood amenities, land use, and other unobserved conditions may help explain differences in rent.
+- **Robustness checks provide additional context.** Alternative sampling resolutions, influence checks, and spatial residual diagnostics did not establish a statistically significant transit–rent relationship in the tested models.
 
-I built a geospatial workflow that combines public datasets, constructs tract-level accessibility measures, and evaluates the relationship between housing costs and transit access.
+These findings do not prove that transit accessibility has no relationship with housing costs. They indicate that this analysis does not provide sufficient evidence of an association under the tested model and data.
 
-1. **Data integration:** Combined 2024 American Community Survey 5-Year Estimates, CATA transit data, food-access data, census boundaries, and geographic datasets.
-2. **Geospatial processing:** Defined a study area covering State College Borough, College Township, Ferguson Township, Harris Township, and Patton Township.
-3. **Feature engineering:** Calculated housing, socioeconomic, transit-accessibility, and food-access measures at the census-tract level.
-4. **Statistical modeling:** Estimated a regression relating median gross rent to transit distance, median household income, and vehicle access.
-5. **Robustness checks:** Evaluated alternative transit-distance sampling resolutions, influential observations, and spatial residual patterns.
+## Methodology
 
-### Diagnostic results
+I developed a geospatial workflow to combine public datasets, calculate tract-level measures, and evaluate relationships between housing costs and accessibility.
 
-- The estimated transit-distance association remained similar using a 500-meter sampling resolution.
-- The association persisted after excluding two potentially influential observations, with 23 observations remaining.
-- The spatial residual diagnostic did not detect statistically significant spatial autocorrelation in the tested model.
+1. **Data integration:** Combined ACS estimates, CATA transit data, food-access measures, census boundaries, and geographic datasets.
+2. **Study-area construction:** Defined the study area using State College Borough, College Township, Ferguson Township, Harris Township, and Patton Township.
+3. **Geospatial processing:** Selected census tracts using a majority-area-overlap rule and calculated housing, socioeconomic, and accessibility features.
+4. **Accessibility analysis:** Estimated straight-line transit distances using sampled grids and compared results with pedestrian-network distances.
+5. **Statistical modeling:** Used multivariable regression to examine median gross rent in relation to transit distance, household income, and vehicle access.
+6. **Diagnostics and sensitivity analysis:** Examined influential observations, alternative sampling resolutions, and spatial autocorrelation in model residuals.
 
-These checks help assess the stability of the findings, but they do not eliminate every source of uncertainty or establish causation.
+### Additional accessibility analysis
 
-## A look at the study area
+The project compares straight-line distance with pedestrian-network distance to illustrate why geographic proximity does not necessarily equal walking distance. The two measures were strongly correlated in the tested data, but network distances were longer on average.
 
-### 1. Housing costs
+Spatial residual analysis did not detect statistically significant spatial autocorrelation in the tested model. This diagnostic does not establish that all spatial dependence is absent.
 
-![Housing affordability dashboard](docs/figures/dashboard_preview_2.png)
+## Maps and Accessibility Measures
 
-*Median gross rent by census tract, based on the 2024 American Community Survey 5-Year Estimates.*
+### Housing costs
 
-Housing costs vary across the study area, which is why I wanted to examine individual census tracts instead of relying on one average for the entire region.
+![Housing affordability by census tract](docs/figures/dashboard_preview_2.png)
 
-### 2. Public transportation accessibility
+*Median gross rent by census tract, based on 2024 ACS 5-Year Estimates.*
 
-![Transit accessibility dashboard](docs/figures/transit_dashboard.png)
+### Public transportation
 
-*Transit accessibility across the study area. The project examines both straight-line distance and pedestrian-network distance, which represent different ways of measuring accessibility.*
+![Transit accessibility across the study area](docs/figures/transit_dashboard.png)
 
-A straight-line distance doesn't necessarily represent the route someone would actually walk. I explored pedestrian-network distances separately to better understand this difference.
+*Transit accessibility using geographic and pedestrian-network distance measures.*
 
-### 3. Food accessibility
+### Food accessibility
 
-![Food accessibility dashboard](docs/figures/food_access_dashboard.png)
+![Food accessibility across the study area](docs/figures/food_access_dashboard.png)
 
 *Geographic variation in the food-access measure used in the project.*
 
-I also included food accessibility because transportation and access to essential resources are part of the broader picture of how convenient a location may be.
+## Data Sources
 
-## Research questions
-
-I built the project around four main questions:
-
-1. How does housing cost vary across the State College area?
-2. How does access to public transportation and food resources vary by location?
-3. Is housing cost associated with transit accessibility after accounting for other observed characteristics?
-4. Do the results change when I use a different spatial sampling resolution?
-
-These questions helped me connect data engineering, geospatial analysis, visualization, and statistical modeling in one project.
-
-## What I found
-
-Here are some of the main findings from my analysis.
-
-| Finding | Result |
-|---|---|
-| Study area | 28 census tracts across five municipalities |
-| Primary regression sample | 25 complete observations |
-| Median gross rent across tracts | $1,214 per month |
-| Median household income across tracts | $84,063 per year |
-| Primary transit-distance measure | 250-meter sampled straight-line distance |
-
-### Housing costs and transit distance
-
-In my primary regression model, greater straight-line distance to the nearest CATA transit stop was associated with lower median gross rent, after accounting for the other variables included in the model.
-
-- **Estimated coefficient:** approximately −$35.4 per additional kilometer.
-- **HC3 robust p-value:** 0.0066.
-- **R²:** approximately 0.19.
-
-The result was similar when I tested a 500-meter sampling resolution. The estimated coefficient was approximately −$35.3 per kilometer, with a robust p-value of 0.0071.
-
-I found this relationship interesting because it shows that the relationship between housing costs and accessibility may not be as straightforward as simply assuming that areas closer to transit always have higher rents.
-
-However, the model explains only part of the variation in rent, and the sample is small. These results should be treated as a starting point for further investigation, not a complete explanation of the housing market.
-
-**An important limitation:** This is an observational analysis. It does not show that distance from transit causes rent to decrease, and it cannot establish what an individual household would pay.
-
-## How I approached the analysis
-
-One of the main things I wanted to learn through this project was how the different stages of a data science workflow fit together.
-
-### 1. Data collection and cleaning
-
-I brought together multiple public datasets covering housing, socioeconomic characteristics, transportation, food access, and geographic boundaries.
-
-I organized the processing scripts so that the source data could be transformed into datasets suitable for geospatial analysis and modeling.
-
-### 2. Geospatial analysis
-
-I used census tracts as the main geographic unit and focused on five municipalities in the State College region:
-
-- State College Borough
-- College Township
-- Ferguson Township
-- Harris Township
-- Patton Township
-
-The geospatial dataset contains 28 census tracts. The primary regression uses 25 because three tracts do not have complete values for all the required model variables.
-
-For transit accessibility, I calculated straight-line distances using a 250-meter sampling grid and tested a 500-meter grid to see whether the results were sensitive to the sampling resolution.
-
-I also worked with OpenStreetMap pedestrian-network data to calculate network distances. This gave me a second way to examine accessibility instead of assuming that straight-line distance represents the route someone would actually walk.
-
-### 3. Statistical modeling
-
-I used a multivariable regression model to explore the relationship between median gross rent and transit distance, controlling for median household income and vehicle access.
-
-I also used HC3 heteroskedasticity-robust standard errors to make the statistical inference less dependent on the assumption of constant error variance.
-
-### 4. Checking the results
-
-I didn't want to stop once I had a statistically significant coefficient. I also looked at whether the model's results were sensitive to diagnostics and alternative specifications.
-
-The project includes:
-
-- Regression diagnostics and residual checks.
-- Cook's distance to identify potentially influential observations.
-- Spatial residual analysis using Moran's I.
-- A sensitivity analysis using a 500-meter sampling resolution.
-- An influence sensitivity check to see whether the transit-distance association persisted when influential observations were excluded.
-
-The spatial residual analysis did not find statistically significant residual spatial autocorrelation in the tested specification. That does not prove that all spatial dependence is absent, but it provides another diagnostic to consider when interpreting the model.
-
-These checks helped me think more carefully about the difference between obtaining a result and understanding how reliable that result might be.
-
-## Data sources
-
-The project uses several public data sources:
-
-| Source | What I used it for |
+| Source | Use |
 |---|---|
 | [U.S. Census Bureau — ACS](https://www.census.gov/programs-surveys/acs) | Median gross rent, household income, rent burden, and vehicle availability |
 | Centre Area Transportation Authority (CATA) GTFS | Transit stops, trips, schedules, and stop events |
 | [USDA Food Access Research Atlas](https://www.ers.usda.gov/data-products/food-access-research-atlas/) and related food-access data | Food-access measures |
 | [Census TIGER/Line](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html) | Census tract boundaries |
-| Centre County GIS | Geographic boundaries for defining the study area |
+| Centre County GIS | Municipal boundaries for defining the study area |
 | [OpenStreetMap](https://www.openstreetmap.org/) | Street-network data for pedestrian accessibility analysis |
 
-Housing and socioeconomic measures use the 2024 ACS 5-Year Estimates.
+## Tools and Technologies
 
-## Tools and technologies
-
-These are the main tools I used throughout the project.
-
-| Tool | How I used it |
+| Tool | Purpose |
 |---|---|
-| Python | Data processing, feature engineering, and analysis |
-| pandas and NumPy | Cleaning, transforming, and analyzing tabular data |
-| GeoPandas and Shapely | Working with geographic datasets |
-| OSMnx and NetworkX | Pedestrian-network analysis |
-| Statsmodels and SciPy | Regression and statistical diagnostics |
+| Python, pandas, NumPy | Data cleaning, processing, and feature engineering |
+| GeoPandas, Shapely | Geospatial data processing |
+| OSMnx, NetworkX | Pedestrian-network analysis |
+| Statsmodels, SciPy | Regression and statistical diagnostics |
 | Matplotlib | Maps and analytical visualizations |
-| HTML, CSS, and JavaScript | Building the interactive dashboard |
-| GeoJSON | Exporting geographic data for the dashboard |
-| Git and GitHub | Version control and project documentation |
+| HTML, CSS, JavaScript | Interactive dashboard |
+| GeoJSON | Geographic data export |
+| Git, GitHub | Version control and project hosting |
 
-## Project structure
-
-I organized the project into separate folders for data, processing scripts, analysis, and the dashboard.
+## Project Structure
 
 ```text
 CollegeTownIQ/
@@ -224,7 +123,6 @@ CollegeTownIQ/
 │   └── processed/
 ├── docs/
 │   ├── figures/
-│   │   └── maps/
 │   ├── analysis_report.md
 │   ├── research_findings.md
 │   └── missing_data_details.csv
@@ -237,17 +135,13 @@ CollegeTownIQ/
 └── README.md
 ```
 
-This is a simplified overview of the main folders. The `src` directory contains scripts for the different processing and analysis stages, while `docs` contains reports and generated figures.
+This is a simplified overview. The `src/` directory contains processing and analysis scripts, `data/` holds source and processed datasets, and `docs/` contains reports and generated figures.
 
-## Running the project locally
+## Running the Project Locally
 
-The live dashboard is available here:
+### 1. Set up the environment
 
-**[CollegeTownIQ Dashboard](https://mannat-sadana.github.io/CollegeTownIQ/dashboard/)**
-
-### Set up the environment
-
-Clone the repository and install the Python dependencies in a virtual environment:
+Clone the repository and install the Python dependencies:
 
 ```bash
 git clone https://github.com/Mannat-Sadana/CollegeTownIQ.git
@@ -259,69 +153,53 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-### Data requirements
+### 2. Explore the dashboard
 
-The dashboard can be explored independently using the exported GeoJSON file included in the repository. Reproducing the full analysis requires the source datasets and intermediate files expected by the scripts. Some raw data and processed outputs are not tracked in Git.
+The dashboard uses the exported GeoJSON file at `dashboard/data/college_town_data.geojson`. You can explore the live version without running the analysis locally:
 
-Before running the processing pipeline, make sure the required ACS data, Census TIGER/Line shapefiles, CATA GTFS files, and food-access data are available in the paths expected by the scripts.
+**[Open the CollegeTownIQ Dashboard →](https://mannat-sadana.github.io/CollegeTownIQ/dashboard/)**
 
-### Reproducing the analysis
-
-Run the processing scripts from the repository root, with the virtual environment activated. The general workflow is:
-
-1. Clean the ACS data and construct the census-tract dataset.
-2. Build the study area and process CATA transit stops and service data.
-3. Calculate transit accessibility and assemble the analysis dataset.
-4. Build the walking-network accessibility and food-access datasets.
-5. Assemble the master dataset and run the statistical analyses.
-6. Export the dashboard data and regenerate the figures as needed.
-
-The 250 m and 500 m straight-line accessibility measures support a sensitivity analysis that checks whether the main regression results are consistent across grid resolutions. Run the relevant accessibility scripts before the analysis scripts that depend on their outputs.
-
-For exact input paths and output filenames, refer to each script's constants and data-loading functions. Not every intermediate dataset is included in the repository, so the full workflow may require obtaining the original data and generating intermediate files first.
-
-### Preview the dashboard locally
-
-The dashboard uses the exported GeoJSON data in `dashboard/data/college_town_data.geojson`. To preview it locally, start a web server from the repository root rather than opening the HTML file directly:
+To preview it locally, start a server from the repository root:
 
 ```bash
 python -m http.server 8000
 ```
 
-Then open `http://localhost:8000/dashboard/` in your browser.
+Then open [http://localhost:8000/dashboard/](http://localhost:8000/dashboard/) in your browser.
 
-### Robustness Check: Housing Tenure
+### 3. Reproduce the analysis
 
-The initial regression showed a negative association between distance to public transit and median gross rent. However, after adding renter share as a control variable, the transit-distance coefficient decreased from approximately −$35.40 to −$18.93 per kilometer and became statistically insignificant (p = 0.4801).
+Reproducing the complete workflow requires the original source datasets and intermediate files expected by the scripts. Some raw data and processed outputs are not tracked in Git.
 
-When both renter share and the college-enrollment proxy were included, the coefficient decreased further to −$12.59 per kilometer (p = 0.6281).
+Broadly, the workflow involves:
 
-These findings suggest that housing tenure may partly account for the original association. However, the analysis uses only 25 observations, and the observational design does not establish causality. The results should therefore be interpreted cautiously.
+1. Preparing ACS data and constructing the census-tract dataset.
+2. Building the study area and processing CATA transit data.
+3. Calculating transit accessibility and assembling the analysis dataset.
+4. Building pedestrian-network and food-access measures.
+5. Running statistical analyses and diagnostic checks.
+6. Exporting dashboard data and regenerating figures.
 
-Detailed results are available in `docs/confounding_check.csv`.
+Ensure the required ACS data, Census TIGER/Line files, CATA GTFS data, and food-access datasets are available at the paths expected by the scripts. Refer to individual scripts for their input paths, parameters, and output filenames.
 
 ## Limitations and Future Improvements
 
-Several limitations matter when interpreting the results:
+Several limitations affect how the findings should be interpreted:
 
-- **Small sample:** The primary regression uses 25 complete census-tract observations, so estimates may be sensitive to the areas included.
+- **Small sample:** The primary regression includes 21 complete census-tract observations.
+- **Missing data:** Two tracts lack required ACS values in the source data and are excluded from the complete-case regression.
 - **Observational design:** The analysis identifies associations, not causal effects.
-- **Geographic aggregation:** Census-tract statistics do not describe every household or individual within an area.
-- **Accessibility assumptions:** Straight-line distance and pedestrian-network distance represent different measures. Neither directly captures actual travel time, service quality, or every individual's access to transit.
-- **Missing data:** Some housing and socioeconomic variables are unavailable for certain tracts, reducing the number of observations available for the regression.
-- **Unobserved factors:** Housing characteristics, neighborhood amenities, land use, and other local conditions may also influence rent.
+- **Geographic aggregation:** Census-tract estimates do not describe every household or individual within a tract.
+- **Accessibility assumptions:** Straight-line and pedestrian-network distances do not directly capture actual travel time, transit frequency, service quality, or individual travel needs.
+- **Unobserved factors:** Housing characteristics, land use, neighborhood amenities, and other conditions may influence rent.
 
-Future improvements could incorporate additional explanatory variables, refine accessibility measures, and expand the analysis to a larger geographic area.
+Future improvements could incorporate additional explanatory variables, refine accessibility measures, and expand the geographic scope to support a larger sample.
 
-## Why I built this project
+## What I Learned
 
-I wanted to build something that connected data science to a real place and a practical problem rather than just complete an analysis and move on to the next assignment.
+Building CollegeTownIQ helped me connect the stages of a data science project—from data collection and cleaning to geospatial feature engineering, statistical modeling, diagnostics, and interactive visualization.
 
-CollegeTownIQ gave me a chance to work through data collection, cleaning, feature engineering, geospatial processing, statistical modeling, diagnostics, and interactive visualization in one project.
-
-It also made me think more carefully about how data should be interpreted. A coefficient or a map can tell part of a story, but understanding the limitations behind it matters just as much.
-
-The project is still something I can improve, but I'm proud of how much I learned by building the different pieces and connecting them into one workflow.
+An important lesson was that a technically complete workflow does not guarantee a statistically significant result. Documenting missing data, testing model assumptions, and communicating uncertainty are just as important as building the model or dashboard.
 
 ---
 
