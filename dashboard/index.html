@@ -1836,8 +1836,8 @@ function showSelectedArea(p) {
 
     insights.push(
       transit > medianTransit
-        ? "Transit access is relatively distant compared with the study area."
-        : "Transit access is relatively close compared with the study area."
+        ? "Transit distance is above the study-area median (farther from transit)."
+        : "Transit distance is below the study-area median (closer to transit)."
     );
 
   }
@@ -1915,8 +1915,8 @@ function showSelectedInsight(p) {
 
     insights.push(
       transit > medianTransit
-        ? "Transit access is relatively distant compared with the study area."
-        : "Transit access is relatively close compared with the study area."
+        ? "Transit distance is above the study-area median (farther from transit)."
+        : "Transit distance is below the study-area median (closer to transit)."
     );
 
   }
@@ -2050,7 +2050,7 @@ function updateComparison() {
 				</tr>
 
 				<tr>
-					<td class="metric-name">Food Access</td>
+					<td class="metric-name">Pop. beyond ½ mile of food</td>
 					<td class="metric-number">${formatPercent(p1.food_access_beyond_half_mile_network_share)}</td>
 					<td class="metric-number">${formatPercent(p2.food_access_beyond_half_mile_network_share)}</td>
 				</tr>

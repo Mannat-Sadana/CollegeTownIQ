@@ -81,13 +81,13 @@ Spatial residual analysis did not detect statistically significant spatial autoc
 
 ![Transit accessibility across the study area](docs/figures/transit_dashboard.png)
 
-*Transit accessibility using geographic and pedestrian-network distance measures.*
+*Darker tracts have higher transit distances (farther from transit); lighter tracts have lower distances (closer to transit).*
 
 ### Food accessibility
 
 ![Food accessibility across the study area](docs/figures/food_access_dashboard.png)
 
-*Geographic variation in the food-access measure used in the project.*
+*Darker tracts have a higher share of residents living beyond 1/2 mile from a SNAP-authorized store, indicating worse food access. This measure uses driving-road distance, not walking distance.*
 
 ## Data Sources
 
