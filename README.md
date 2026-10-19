@@ -39,6 +39,8 @@ The study area covers **23 census tracts** across five municipalities. The prima
 | Transit-distance coefficient | +$0.518 per additional km |
 | Robust p-value for transit distance | 0.9884 |
 
+*The primary regression uses 21 complete observations from the current 250 m transit-accessibility dataset. An earlier analysis reported different results using a broader tract sample; see `docs/regression_provenance.md` for details.*
+
 *Housing and socioeconomic measures use the 2024 American Community Survey (ACS) 5-Year Estimates. The reported rent and income figures are medians of tract-level estimates, not individual household values.*
 
 ### Interpreting the results
@@ -46,7 +48,7 @@ The study area covers **23 census tracts** across five municipalities. The prima
 - **Housing costs vary geographically.** Median gross rent ranges from $674 to $1,924 per month across the observed tracts.
 - **The transit–rent association is not statistically significant.** After controlling for median household income and vehicle access, the estimated transit-distance coefficient is close to zero.
 - **Other factors may matter.** Housing characteristics, neighborhood amenities, land use, and other unobserved conditions may help explain differences in rent.
-- **Robustness checks provide additional context.** Alternative sampling resolutions, influence checks, and spatial residual diagnostics did not establish a statistically significant transit–rent relationship in the tested models.
+- **Historical results differ from the current analysis.** An earlier analysis reported a statistically significant negative association between transit distance and rent. The current primary model does not reproduce that finding. Differences in tract selection and dataset generation mean the historical and current estimates are not directly comparable.
 
 These findings do not prove that transit accessibility has no relationship with housing costs. They indicate that this analysis does not provide sufficient evidence of an association under the tested model and data.
 
