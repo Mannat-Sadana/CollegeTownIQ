@@ -1400,16 +1400,8 @@ const metricInfo = {
 
         const normalized = (value - min) / (max - min);
 
-  // Lower values are more favorable for these metrics.
-        const lowerIsBetter = [
-            "median_gross_rent",
-            "median_rent_burden_pct",
-            "median_network_transit_distance_m",
-            "food_access_beyond_half_mile_network_share"
-        ];
-        const score = lowerIsBetter.includes(metric)
-            ? 1 - normalized
-            : normalized;
+        // Darker always represents a higher metric value.
+        const score = normalized;
 
         if (score < 0.2) return "#edf8fb";
         if (score < 0.4) return "#b2e2e2";
@@ -1461,6 +1453,7 @@ function addLegend(metric) {
       <span>${format(min)}</span>
       <span>${format(max)}</span>
     </div>
+    <div class="legend-direction">Darker = higher value</div>
 
     <div class="legend-missing">
       <span class="legend-missing-swatch"></span>
@@ -1854,8 +1847,8 @@ function showSelectedArea(p) {
 
     insights.push(
       food > medianFood
-        ? "Food access is above the study-area median."
-        : "Food access is below the study-area median."
+        ? "A higher-than-median share of residents lives beyond 1/2 mile from a SNAP-authorized store (worse access)."
+        : "A lower-than-median share of residents lives beyond 1/2 mile from a SNAP-authorized store (better access)."
     );
 
   }
@@ -1932,8 +1925,8 @@ function showSelectedInsight(p) {
 
     insights.push(
       food > medianFood
-        ? "Food access is above the study-area median."
-        : "Food access is below the study-area median."
+        ? "A higher-than-median share of residents lives beyond 1/2 mile from a SNAP-authorized store (worse access)."
+        : "A lower-than-median share of residents lives beyond 1/2 mile from a SNAP-authorized store (better access)."
     );
 
   }
