@@ -20,9 +20,13 @@ The interactive dashboard lets you explore housing and accessibility patterns ge
 
 *Explore housing affordability across census tracts.*
 
-![CollegeTownIQ census tract comparison](docs/figures/tract_comparison.png)
+![First census tract comparison](docs/figures/tract_comparison.png)
 
-*Compare tracts across housing costs, transit distance, food access, and vehicle access.*
+*Compare two census tracts across housing costs and accessibility measures.*
+
+![Second census tract comparison](docs/figures/comparison_2.png)
+
+*Additional census tract comparison using the updated dashboard metrics.*
 
 ## Key Findings
 
