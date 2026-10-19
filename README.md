@@ -16,8 +16,6 @@ Rather than relying on a single regional average, I combined census, transit, fo
 
 The interactive dashboard lets you explore housing and accessibility patterns geographically, inspect census-tract metrics, and compare two tracts.
 
-![CollegeTownIQ housing affordability map](docs/figures/dashboard_preview.png)
-
 *Explore housing affordability across census tracts.*
 
 ![First census tract comparison](docs/figures/tract_comparison.png)
