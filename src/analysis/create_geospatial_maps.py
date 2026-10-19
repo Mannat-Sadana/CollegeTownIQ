@@ -70,25 +70,28 @@ def main() -> None:
 
     create_map(
         dataset,
-        column="median_gross_rent",
-        title="Median Gross Rent Across the CollegeTownIQ Study Area",
-        legend_label="Median gross rent ($)",
-        filename="median_gross_rent_map.png",
-    )
-
-    create_map(
-        dataset,
-        column="median_transit_distance_m",
+        column="median_network_transit_distance_m",
         title="Network Transit Accessibility Across the CollegeTownIQ Study Area",
-        legend_label="Median pedestrian-network distance to transit stop (m)",
+        legend_label="Median network distance to transit stop (m)",
         filename="transit_accessibility_map.png",
     )
 
     create_map(
         dataset,
+        column="median_gross_rent",
+        title="Housing Affordability Across the CollegeTownIQ Study Area",
+        legend_label="Median gross rent ($ per month)",
+        filename="median_gross_rent_map.png",
+    )
+
+    create_map(
+        dataset,
         column="food_access_beyond_half_mile_network_share",
-        title="Food Access Across the CollegeTownIQ Study Area",
-        legend_label="Share beyond 1/2 mile (%)",
+        title="Population Distance from SNAP-Authorized Foodstores",
+        legend_label=(
+            "Population beyond 1/2 mile "
+            "(driving-road distance, %)"
+        ),
         filename="food_access_map.png",
     )
 

@@ -263,6 +263,25 @@ select {
     color: var(--muted);
 }
 
+.legend-missing {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 9px;
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.legend-missing-swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    background: #d1d5db;
+    border: 1px solid #9ca3af;
+}
+
+
 /* =========================
    MAIN DASHBOARD LAYOUT
    ========================= */
@@ -1332,9 +1351,8 @@ const metricInfo = {
 
   food_access_beyond_half_mile_network_share: {
 
-    title: "Food Access",
-
-    label: "Population Beyond 1/2 Mile",
+    title: "SNAP Retailer Access",
+    label: "Population Beyond 1/2 Mile (Driving Distance)",
 
     format: value => value.toFixed(1) + "%"
 
@@ -1438,10 +1456,17 @@ function addLegend(metric) {
       `).join("")}
     </div>
 
+
     <div class="legend-labels">
       <span>${format(min)}</span>
       <span>${format(max)}</span>
     </div>
+
+    <div class="legend-missing">
+      <span class="legend-missing-swatch"></span>
+     <span>Gray = data unavailable</span>
+    </div>
+
 
     <div class="comparison-legend">
       <div class="comparison-legend-item">
@@ -1485,51 +1510,6 @@ function styleFeature(feature) {
     color: outlineColor,
     fillOpacity: 0.75
   };
-}
-
-
-function addLegend(metric) {
-    const oldLegend = document.querySelector(".map-legend");
-
-    if (oldLegend) {
-        oldLegend.remove();
-    }
-
-    const values = getValues(metric);
-
-    if (!values.length) return;
-
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-
-    const legend = L.control({ position: "bottomright" });
-
-    legend.onAdd = function() {
-        const div = L.DomUtil.create("div", "map-legend");
-
-        div.innerHTML = `
-            <div class="legend-title">
-                ${metricInfo[metric].label}
-            </div>
-
-            <div class="legend-scale">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-
-            <div class="legend-labels">
-                <span>${metricInfo[metric].format(min)}</span>
-                <span>${metricInfo[metric].format(max)}</span>
-            </div>
-        `;
-
-        return div;
-    };
-
-    legend.addTo(map);
 }
 
 function updateMap() {

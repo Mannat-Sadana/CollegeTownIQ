@@ -44,3 +44,31 @@ The historical numbers are retained only as documented historical results. They 
 The current 250 m regression is the primary reported model. The README reflects its current estimates. The historical discrepancy, model specification, likely sample-selection change, and reproduction limitation are documented here.
 
 The 50% overlap threshold should not be changed solely to recover statistical significance. Any future comparison must identify the input dataset, tract-selection rule, complete-case sample, distance variable, and regression specification.
+
+## Data limitations and accessibility quality
+
+### Unavailable ACS estimates
+
+The 23-tract study-area dataset contains two tracts with unavailable American Community Survey (ACS) estimates for median gross rent, median rent burden, and median household income. These unavailable values are retained as missing rather than replaced with zero or imputed values. A missing estimate does not mean that the underlying value is zero.
+
+The missing estimates reduce the complete-case sample available to the primary regression to 21 observations. Regression results should therefore be interpreted in light of the small sample size and the limited number of census tracts in the study area.
+
+Vehicle-access values are available for these tracts, but that does not resolve the missing rent and income estimates.
+
+### Pedestrian-network accessibility limitations
+
+The pedestrian-network accessibility workflow estimates distances from sampled tract locations to transit stops using a walking-network graph. Sample locations are associated with nearby graph nodes, and the current workflow applies a 250 m maximum sample-to-node snapping-distance filter.
+
+Coverage is uneven across tracts. Some tracts have substantial proportions of sample points beyond the 250 m snapping threshold, so the retained sample may represent those tracts less completely. Tract-level distance estimates should be interpreted alongside the coverage diagnostics rather than as equally reliable measurements for every tract.
+
+The current snap-adjusted distance is an approximate sensitivity measure: it adds the straight-line distance from a sample point to its snapped network node to the network distance from that node to a transit stop. It is not a fully routed pedestrian distance for the connector segment and may not account for barriers or inaccessible land.
+
+The baseline network-distance metric and the snap-adjusted sensitivity measure should be distinguished in reporting. Neither should be interpreted as a complete measure of transit service quality or actual travel time.
+
+### Food-access measure
+
+The USDA 2025 SNAP Retailer Access Map data provide separate straight-line-distance and driving-road-distance indicators. The driving-distance measure is not a pedestrian-network measure and should not be described as walking access. These indicators represent a specific distance-based aspect of access to SNAP-authorized retailers; they do not, by themselves, measure food insecurity, affordability, or access to every food retailer.
+
+### Interpretation and reporting
+
+The project reports unavailable ACS estimates as missing, documents the accessibility workflow and its coverage limitations, and distinguishes driving-distance food-access indicators from pedestrian-network transit accessibility. Findings should be interpreted as exploratory tract-level analysis rather than causal evidence.

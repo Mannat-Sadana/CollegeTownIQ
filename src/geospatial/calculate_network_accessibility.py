@@ -183,6 +183,7 @@ def calculate_nearest_stop_distances(
     return distances
 
 
+
 def calculate_accessibility(
     tracts,
     walking_network,
@@ -190,8 +191,15 @@ def calculate_accessibility(
 ):
     results = []
 
-    for _, tract in tracts.iterrows():
+    # Provisional quality-control threshold.
+    MAX_SNAP_DISTANCE_M = 250
 
+    nodes = ox.graph_to_gdfs(
+        walking_network,
+        edges=False,
+    )
+
+    for _, tract in tracts.iterrows():
         points = create_sample_points(
             tract.geometry,
             GRID_SPACING_METERS,
@@ -203,42 +211,105 @@ def calculate_accessibility(
             Y=[point.y for point in points],
         )
 
-        point_distances = []
+        point_records = []
 
-        for node in sample_nodes:
-            if node in network_distances:
-                point_distances.append(
-                    network_distances[node]
-                )
-
-        if not point_distances:
-            raise ValueError(
-                f"No network distance found "
-                f"for tract {tract['GEOID']}"
+        for point, node in zip(points, sample_nodes):
+            snap_distance = point.distance(
+                nodes.loc[node].geometry
             )
 
-        distances = pd.Series(
-            point_distances
-        )
+            network_distance = network_distances.get(
+                node
+            )
 
-        results.append(
-            {
-                "GEOID": tract["GEOID"],
-                "sample_point_count": len(
-                    distances
-                ),
-                "median_network_transit_distance_m":
-                    distances.median(),
-                "p25_network_transit_distance_m":
-                    distances.quantile(0.25),
-                "p75_network_transit_distance_m":
-                    distances.quantile(0.75),
-                "max_network_transit_distance_m":
-                    distances.max(),
-            }
-        )
+            point_records.append({
+                "snap_distance_m": snap_distance,
+                "network_distance_m": network_distance,
+            })
+
+        point_df = pd.DataFrame(point_records)
+
+        # Only points with a network distance and a
+        # sufficiently close network node are retained.
+        valid = point_df[
+            point_df["network_distance_m"].notna()
+            & (
+                point_df["snap_distance_m"]
+                <= MAX_SNAP_DISTANCE_M
+            )
+        ]
+
+        # Original baseline: network distance from the
+        # snapped sample-point node to the nearest stop.
+        # Sensitivity estimate adds straight-line snap distance.
+        # This is not a true routed walking distance.
+        if valid.empty:
+            median_distance = float("nan")
+            p25_distance = float("nan")
+            p75_distance = float("nan")
+            max_distance = float("nan")
+
+            median_corrected_distance = float("nan")
+            p25_corrected_distance = float("nan")
+            p75_corrected_distance = float("nan")
+            max_corrected_distance = float("nan")
+        else:
+            baseline_distances = valid["network_distance_m"]
+
+            corrected_distances = (
+                valid["network_distance_m"]
+                + valid["snap_distance_m"]
+            )
+
+            median_distance = baseline_distances.median()
+            p25_distance = baseline_distances.quantile(0.25)
+            p75_distance = baseline_distances.quantile(0.75)
+            max_distance = baseline_distances.max()
+
+            median_corrected_distance = corrected_distances.median()
+            p25_corrected_distance = corrected_distances.quantile(0.25)
+            p75_corrected_distance = corrected_distances.quantile(0.75)
+            max_corrected_distance = corrected_distances.max()
+
+        results.append({
+            "GEOID": str(tract["GEOID"]),
+            "sample_point_count": len(point_df),
+            "valid_sample_point_count": len(valid),
+            "pct_points_within_250m": (
+                len(valid) / len(point_df) * 100
+                if len(point_df) else float("nan")
+            ),
+            "median_snap_distance_m": (
+                point_df["snap_distance_m"].median()
+            ),
+            "median_network_transit_distance_m": (
+                median_distance
+            ),
+            "p25_network_transit_distance_m": (
+                p25_distance
+            ),
+            "p75_network_transit_distance_m": (
+                p75_distance
+            ),
+            "max_network_transit_distance_m": (
+                max_distance
+            ),
+            "median_snap_adjusted_transit_distance_m": (
+                median_corrected_distance
+            ),
+            "p25_snap_adjusted_transit_distance_m": (
+                p25_corrected_distance
+            ),
+            "p75_snap_adjusted_transit_distance_m": (
+                p75_corrected_distance
+            ),
+            "max_snap_adjusted_transit_distance_m": (
+                max_corrected_distance
+            ),
+        })
 
     return pd.DataFrame(results)
+
 
 
 def save_results(
